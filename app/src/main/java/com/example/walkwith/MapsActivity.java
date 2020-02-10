@@ -24,7 +24,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
-
+    // This is a test comment to ensure it's working
 
     /**
      * Manipulates the map once available.
