@@ -12,7 +12,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
-    //i love potatos
     private GoogleMap mMap;
 
     @Override
@@ -24,10 +23,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
-    // This is a test comment to ensure it's working
-    //Jerry's Test comment
-    // another comment
-    //elora's comment
+
     
 
     /**
