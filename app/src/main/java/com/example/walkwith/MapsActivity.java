@@ -27,6 +27,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // This is a test comment to ensure it's working
     //Jerry's Test comment
     // another comment
+    //elora's comment
+    
 
     /**
      * Manipulates the map once available.
