@@ -2,10 +2,19 @@ package com.example.walkwith;
 
 import androidx.fragment.app.FragmentActivity;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -32,10 +41,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Toast toast = Toast.makeText(context, text, duration);
         toast.show();
-
+        // New network test to see if server works
+        networkTest();
     }
 
-    
 
     /**
      * Manipulates the map once available.
@@ -54,5 +63,51 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+
+    private void networkTest() {
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String ip = "0.0.0.0"; // Replace this with your own
+        String port = "5000"; // Usually this
+        String url ="https://"+ip+":"+port+"/ping";
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+                        alertDialog("Network Connection Success!", response.substring(0,500));
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                alertDialog("Network connection failed", "Reason: "+error);
+            }
+        });
+
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
+    }
+
+    private void alertDialog(final String title, final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if (!isFinishing()){
+                    new AlertDialog.Builder(MapsActivity.this)
+                            .setTitle(title)
+                            .setMessage(message)
+                            .setCancelable(false)
+                            .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Whatever...
+                                }
+                            }).show();
+                }
+            }
+        });
     }
 }
