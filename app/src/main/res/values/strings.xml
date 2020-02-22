@@ -5,6 +5,9 @@
     <string name="title_activity_trusted_contacts">Trusted Contacts</string>
     <string name="title_activity_active">Active Walkers</string>
     <string name="title_activity_walk">Start New Walk</string>
+    <string name="title_activity_main_menu">Main Menu</string>
+    <string name="title_activity_focus">Main Menu</string>
+
     <!-- Preference Titles -->
 
     <!-- Messages Preferences -->
