@@ -40,7 +40,16 @@ public class LoginActivity extends AppCompatActivity {
         final EditText usernameEditText = findViewById(R.id.email);
         final EditText passwordEditText = findViewById(R.id.password);
         final Button loginButton = findViewById(R.id.login);
+        final Button createAccountButton = findViewById(R.id.createAccount);
+        final Button forgotPasswordButton = findViewById(R.id.forgotPassword);
         final ProgressBar loadingProgressBar = findViewById(R.id.loading);
+
+        createAccountButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent myIntent = new Intent(LoginActivity.this, RegisterActivity.class);
+                LoginActivity.this.startActivity(myIntent);
+            }
+        });
 
         loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
             @Override

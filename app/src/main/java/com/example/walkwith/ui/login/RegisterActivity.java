@@ -4,6 +4,7 @@ import android.app.Activity;
 
 import androidx.lifecycle.Observer;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -22,6 +23,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.walkwith.MainMenu;
 import com.example.walkwith.R;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -37,8 +39,16 @@ public class RegisterActivity extends AppCompatActivity {
 
         final EditText usernameEditText = findViewById(R.id.username);
         final EditText passwordEditText = findViewById(R.id.password);
-        final Button loginButton = findViewById(R.id.login);
+        final Button loginButton = findViewById(R.id.register);
+        final Button gotAccount = findViewById(R.id.gotAccount);
         final ProgressBar loadingProgressBar = findViewById(R.id.loading);
+
+        gotAccount.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent myIntent = new Intent(RegisterActivity.this, LoginActivity.class);
+                RegisterActivity.this.startActivity(myIntent);
+            }
+        });
 
         loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
             @Override
@@ -119,7 +129,8 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void updateUiWithUser(LoggedInUserView model) {
         String welcome = getString(R.string.welcome) + model.getDisplayName();
-        // TODO : initiate successful logged in experience
+        Intent myIntent = new Intent(RegisterActivity.this, MainMenu.class);
+        RegisterActivity.this.startActivity(myIntent);
         Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
     }
 
