@@ -3,13 +3,13 @@ package com.example.walkwith.ui.login;
 import android.app.Activity;
 
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,8 +23,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.walkwith.R;
-import com.example.walkwith.ui.login.LoginViewModel;
-import com.example.walkwith.ui.login.LoginViewModelFactory;
 
 public class RegisterActivity extends AppCompatActivity {
 

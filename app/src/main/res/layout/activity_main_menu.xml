@@ -12,7 +12,7 @@
         android:layout_width="413dp"
         android:layout_height="77dp"
         android:layout_marginBottom="1dp"
-        android:text="Settings"
+        android:text="@string/title_activity_settings"
         android:textColor="#FF5722"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -24,7 +24,7 @@
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="414dp"
         android:layout_height="74dp"
-        android:text="Trusted Contacts"
+        android:text="@string/title_activity_trusted_contacts"
         android:textColor="#FF5722"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/button"
@@ -37,7 +37,7 @@
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="414dp"
         android:layout_height="74dp"
-        android:text="Active Walkers"
+        android:text="@string/title_activity_active"
         android:textColor="#FF5722"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/button2"
@@ -50,7 +50,7 @@
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="414dp"
         android:layout_height="74dp"
-        android:text="Start New Walk"
+        android:text="@string/title_activity_walk"
         android:textColor="#FF5722"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/button3"
@@ -59,7 +59,6 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.gms.maps.MapView
-        android:id="@+id/mapView"
         android:layout_width="412dp"
         android:layout_height="435dp"
         app:layout_constraintBottom_toTopOf="@+id/button4"

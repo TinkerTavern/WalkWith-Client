@@ -1,5 +1,8 @@
 package com.example.walkwith.data;
 
+
+import androidx.annotation.NonNull;
+
 /**
  * A generic class that holds a result success w/ data or an error exception.
  */
@@ -8,6 +11,7 @@ public class Result<T> {
     private Result() {
     }
 
+    @NonNull
     @Override
     public String toString() {
         if (this instanceof Result.Success) {

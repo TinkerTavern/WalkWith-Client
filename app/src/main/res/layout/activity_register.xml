@@ -34,10 +34,10 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginEnd="85dp"
-        android:layout_marginRight="85dp"
         android:layout_marginBottom="293dp"
         android:backgroundTint="#F44336"
         android:ems="10"
+        android:autofillHints="True"
         android:hint="@string/prompt_password"
         android:inputType="textPassword" />
 
@@ -48,11 +48,11 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="97dp"
-        android:layout_marginLeft="97dp"
         android:layout_marginTop="302dp"
         android:backgroundTint="#F44336"
         android:ems="10"
         android:hint="@string/prompt_email"
+        android:autofillHints="True"
         android:inputType="textEmailAddress" />
 
     <EditText
@@ -65,10 +65,10 @@
         android:backgroundTint="#F44336"
         android:ems="10"
         android:hint="@string/username"
+        android:autofillHints="True"
         android:inputType="textPersonName" />
 
     <Button
-        android:id="@+id/register"
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="226dp"
         android:layout_height="wrap_content"
@@ -88,9 +88,8 @@
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="39dp"
-        android:layout_marginRight="39dp"
         android:layout_marginBottom="167dp"
-        android:text="Already have an account? Login"
+        android:text="@string/to_login"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="#F44336" />
 </RelativeLayout>

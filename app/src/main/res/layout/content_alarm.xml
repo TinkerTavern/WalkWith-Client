@@ -9,41 +9,53 @@
     tools:showIn="@layout/activity_alarm">
 
     <Button
-        android:id="@+id/alertButton"
+        android:id="@+id/button5"
         android:layout_width="243dp"
-        android:layout_height="78dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="33dp"
         android:background="#FF9800"
-        android:text="Alert Contacts"
+        android:text="@string/alert"
         android:textSize="24sp"
-        tools:layout_editor_absoluteX="84dp"
-        tools:layout_editor_absoluteY="272dp" />
+        app:layout_constraintBottom_toTopOf="@+id/textView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
     <ImageView
-        android:id="@+id/logo"
+        android:id="@+id/imageView"
         android:layout_width="220dp"
-        android:layout_height="196dp"
-        tools:layout_editor_absoluteX="95dp"
-        tools:layout_editor_absoluteY="30dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="46dp"
+        android:contentDescription="@string/description"
+        app:layout_constraintBottom_toTopOf="@+id/button5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@drawable/logo" />
 
     <TextView
-        android:id="@+id/nightline"
+        android:id="@+id/textView"
         android:layout_width="211dp"
-        android:layout_height="91dp"
-        android:text="You can find the number for Nightline on the reverse of your library card, or email on listening@bath.nightline.ac.uk"
+        android:layout_height="0dp"
+        android:layout_marginBottom="22dp"
+        android:text="@string/nightline"
         android:textAlignment="center"
-        tools:layout_editor_absoluteX="100dp"
-        tools:layout_editor_absoluteY="383dp"
-        />
+        app:layout_constraintBottom_toTopOf="@+id/textView2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button5" />
 
     <TextView
-        android:id="@+id/samaritans"
+        android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Samaritans: 116 123"
+        android:layout_marginStart="40dp"
+        android:layout_marginBottom="160dp"
+        android:text="@string/samaritans"
         android:textAlignment="center"
-        tools:layout_editor_absoluteX="140dp"
-        tools:layout_editor_absoluteY="496dp"
-        />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
