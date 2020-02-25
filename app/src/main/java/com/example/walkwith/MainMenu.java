@@ -30,15 +30,23 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 
 import java.util.Objects;
 
 public class MainMenu extends FragmentActivity implements View.OnClickListener, GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener,
-        OnMapReadyCallback{
+        OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     private GoogleMap mMap;
     private int MY_LOCATION_REQUEST_CODE = 1;
+
+    //Random Friends
+    private Marker mFriendOne;
+    private Marker mFriendTwo;
+    private Marker mFriendThree;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +142,27 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_LOCATION_REQUEST_CODE);
         }
+
+        //Adding friend to map
+        mFriendOne = mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(51, 2.3))
+                .title("Friend One")
+        );
+        mFriendOne.setTag(0);
+
+        mFriendTwo = mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(51, 2.6))
+                .title("Friend Two")
+        );
+        mFriendTwo.setTag(0);
+
+        mFriendThree = mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(51, 0.1))
+                .title("Friend Three")
+        );
+        mFriendThree.setTag(0);
+
+        mMap.setOnMarkerClickListener(this);
     }
 
     @Override
@@ -253,5 +282,11 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Toast.makeText(this, "Friend button clicked", Toast.LENGTH_SHORT).show();
+        return false;
     }
 }

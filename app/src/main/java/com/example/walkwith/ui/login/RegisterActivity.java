@@ -37,7 +37,7 @@ public class RegisterActivity extends AppCompatActivity {
         loginViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
 
-        final EditText usernameEditText = findViewById(R.id.username);
+        final EditText usernameEditText = findViewById(R.id.first_name);
         final EditText passwordEditText = findViewById(R.id.password);
         final Button loginButton = findViewById(R.id.register);
         final Button gotAccount = findViewById(R.id.gotAccount);
