@@ -48,11 +48,11 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="97dp"
-        android:layout_marginTop="302dp"
+        android:layout_marginTop="152dp"
+        android:autofillHints="True"
         android:backgroundTint="#F44336"
         android:ems="10"
         android:hint="@string/prompt_email"
-        android:autofillHints="True"
         android:inputType="textEmailAddress" />
 
     <EditText
@@ -61,11 +61,11 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="243dp"
+        android:layout_marginTop="188dp"
+        android:autofillHints="True"
         android:backgroundTint="#F44336"
         android:ems="10"
         android:hint="@string/username"
-        android:autofillHints="True"
         android:inputType="textPersonName" />
 
     <Button

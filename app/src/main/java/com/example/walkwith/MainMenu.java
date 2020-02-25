@@ -77,7 +77,7 @@ public class MainMenu extends FragmentActivity implements GoogleMap.OnMyLocation
      * installed Google Play services and returned to the app.
      */
     @Override
-    public void onMapReady(GoogleMap googleMap) { //TODO: Make this cleaner
+    public void onMapReady(GoogleMap googleMap) { 
         mMap = googleMap;
         // Get users last location to show on map
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
