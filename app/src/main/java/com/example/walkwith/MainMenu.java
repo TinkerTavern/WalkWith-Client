@@ -27,8 +27,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -121,7 +119,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
      * installed Google Play services and returned to the app.
      */
     @Override
-    public void onMapReady(GoogleMap googleMap) { 
+    public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         // Get users last location to show on map
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -210,9 +208,9 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
 
     private void networkTest() {
         RequestQueue queue = Volley.newRequestQueue(this);
-        String ip = "0.0.0.0"; // Replace this with your own
+        String ip = "138.38.149.100"; // Replace this with your own
         String port = "5000"; // Usually this
-        String url = "https://" + ip + ":" + port + "/ping";
+        String url = "http://" + ip + ":" + port + "/ping";
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -220,7 +218,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
                     @Override
                     public void onResponse(String response) {
                         // Display the first 500 characters of the response string.
-                        alertDialog("Network Connection Success!", response.substring(0, 500));
+                        alertDialog("Network Connection Success!", response);
                     }
                 }, new Response.ErrorListener() {
             @Override
