@@ -28,18 +28,32 @@
         app:layout_constraintVertical_bias="0.3" />
 
     <EditText
-        android:id="@+id/password"
+        android:id="@+id/first_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginEnd="85dp"
-        android:layout_marginBottom="293dp"
+        android:layout_marginStart="97dp"
+        android:layout_marginTop="100dp"
+        android:autofillHints="True"
         android:backgroundTint="#F44336"
         android:ems="10"
+        android:hint="@string/first_name"
+        android:inputType="textPersonName" />
+
+    <EditText
+        android:id="@+id/last_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="97dp"
+        android:layout_marginTop="150dp"
         android:autofillHints="True"
-        android:hint="@string/prompt_password"
-        android:inputType="textPassword" />
+        android:backgroundTint="#F44336"
+        android:ems="10"
+        android:hint="@string/last_name"
+        android:inputType="textPersonName" />
 
     <EditText
         android:id="@+id/email"
@@ -48,7 +62,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="97dp"
-        android:layout_marginTop="152dp"
+        android:layout_marginTop="200dp"
         android:autofillHints="True"
         android:backgroundTint="#F44336"
         android:ems="10"
@@ -56,26 +70,59 @@
         android:inputType="textEmailAddress" />
 
     <EditText
-        android:id="@+id/username"
+        android:id="@+id/confirm_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="188dp"
+        android:layout_marginStart="97dp"
+        android:layout_marginTop="250dp"
         android:autofillHints="True"
         android:backgroundTint="#F44336"
         android:ems="10"
-        android:hint="@string/username"
-        android:inputType="textPersonName" />
+        android:hint="@string/confirm_email"
+        android:inputType="textEmailAddress" />
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="97dp"
+        android:layout_marginTop="300dp"
+        android:backgroundTint="#F44336"
+        android:ems="10"
+        android:autofillHints="True"
+        android:hint="@string/prompt_password"
+        android:inputType="textPassword" />
+
+    <EditText
+        android:id="@+id/confirm_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="97dp"
+        android:layout_marginTop="350dp"
+        android:backgroundTint="#F44336"
+        android:ems="10"
+        android:autofillHints="True"
+        android:hint="@string/confirm_password"
+        android:inputType="textPassword" />
+
+
+
 
     <Button
         android:id="@+id/register"
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="226dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="234dp"
+        android:layout_marginStart="97dp"
+        android:layout_marginTop="400dp"
         android:background="#F44336"
         android:text="@string/create_account"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
@@ -86,10 +133,10 @@
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="374dp"
         android:layout_height="51dp"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="39dp"
-        android:layout_marginBottom="167dp"
+        android:layout_marginStart="97dp"
+        android:layout_marginTop="450dp"
         android:text="@string/to_login"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="#F44336" />
