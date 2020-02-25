@@ -16,6 +16,8 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -34,9 +36,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 
 import java.util.Objects;
 
-public class MainMenu extends FragmentActivity implements GoogleMap.OnMyLocationButtonClickListener,
+public class MainMenu extends FragmentActivity implements View.OnClickListener, GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener,
-        OnMapReadyCallback {
+        OnMapReadyCallback{
     private GoogleMap mMap;
     private int MY_LOCATION_REQUEST_CODE = 1;
 
@@ -51,8 +53,7 @@ public class MainMenu extends FragmentActivity implements GoogleMap.OnMyLocation
 
         try {
             Objects.requireNonNull(mapFragment).getMapAsync(this);
-        }
-        catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             alertDialog("Map loading error", e.getMessage());
         }
         // Added simple toast
@@ -64,8 +65,51 @@ public class MainMenu extends FragmentActivity implements GoogleMap.OnMyLocation
         toast.show();
         // New network test to see if server works
         networkTest();
+
+        Button viewSettings = findViewById(R.id.button); //Settings button
+        Button viewTrustedContacts = findViewById(R.id.button2); //Trusted Contacts button
+        Button viewActiveWalkers = findViewById(R.id.button3); //Active Walkers button
+        Button startNewWalk = findViewById(R.id.button4); //New Walk button
+
+        viewSettings.setOnClickListener(this);
+        viewTrustedContacts.setOnClickListener(this);
+        viewActiveWalkers.setOnClickListener(this);
+        startNewWalk.setOnClickListener(this);
     }
 
+        @Override
+        public void onClick(View v){
+            switch (v.getId()) {
+                case R.id.button:
+                    openSettings();
+                case R.id.button2:
+                    viewTrustedContacts();
+                case R.id.button3:
+                    viewActiveWalkers();
+                case R.id.button4:
+                    openWalking();
+            }
+        }
+
+    protected void openSettings(){
+        Intent openSettings = new Intent(this, SettingsActivity.class);
+        startActivity(openSettings);
+    }
+
+    protected void viewTrustedContacts() {
+        Intent openContacts = new Intent (this, TrustedContacts.class);
+        startActivity(openContacts);
+    }
+
+    protected void viewActiveWalkers() {
+        Intent viewWalkers = new Intent (this, FocusView.class);
+        startActivity(viewWalkers);
+    }
+
+    protected void openWalking(){
+        Intent openWalking = new Intent(this, WalkingActivity.class);
+        startActivity(openWalking);
+    }
 
     /**
      * Manipulates the map once available.
