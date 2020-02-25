@@ -8,6 +8,8 @@
     <string name="title_activity_main_menu">Main Menu</string>
     <string name="title_activity_focus">Focus Menu</string>
     <string name="title_activity_register">Sign Up</string>
+    <string name="title_activity_walking">Walk Menu</string>
+
 
     <!-- Preference Titles -->
 
