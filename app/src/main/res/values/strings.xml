@@ -33,5 +33,9 @@
         card, or email on listening@bath.nightline.ac.uk</string>
     <string name="samaritans">Samaritans: 116 123</string>
     <string name="eta">ETA - 22:55</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="confirm_email">Confirm Email</string>
+    <string name="confirm_password">Confirm Password</string>
 
 </resources>
