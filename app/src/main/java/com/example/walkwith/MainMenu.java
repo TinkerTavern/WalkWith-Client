@@ -80,12 +80,16 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
             switch (v.getId()) {
                 case R.id.button:
                     openSettings();
+                    break;
                 case R.id.button2:
                     viewTrustedContacts();
+                    break;
                 case R.id.button3:
                     viewActiveWalkers();
+                    break;
                 case R.id.button4:
                     openWalking();
+                    break;
             }
         }
 
