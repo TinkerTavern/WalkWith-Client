@@ -16,6 +16,8 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -25,8 +27,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -34,9 +34,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 
 import java.util.Objects;
 
-public class MainMenu extends FragmentActivity implements GoogleMap.OnMyLocationButtonClickListener,
+public class MainMenu extends FragmentActivity implements View.OnClickListener, GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener,
-        OnMapReadyCallback {
+        OnMapReadyCallback{
     private GoogleMap mMap;
     private int MY_LOCATION_REQUEST_CODE = 1;
 
@@ -51,8 +51,7 @@ public class MainMenu extends FragmentActivity implements GoogleMap.OnMyLocation
 
         try {
             Objects.requireNonNull(mapFragment).getMapAsync(this);
-        }
-        catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             alertDialog("Map loading error", e.getMessage());
         }
         // Added simple toast
@@ -64,8 +63,51 @@ public class MainMenu extends FragmentActivity implements GoogleMap.OnMyLocation
         toast.show();
         // New network test to see if server works
         networkTest();
+
+        Button viewSettings = findViewById(R.id.button); //Settings button
+        Button viewTrustedContacts = findViewById(R.id.button2); //Trusted Contacts button
+        Button viewActiveWalkers = findViewById(R.id.button3); //Active Walkers button
+        Button startNewWalk = findViewById(R.id.button4); //New Walk button
+
+        viewSettings.setOnClickListener(this);
+        viewTrustedContacts.setOnClickListener(this);
+        viewActiveWalkers.setOnClickListener(this);
+        startNewWalk.setOnClickListener(this);
     }
 
+        @Override
+        public void onClick(View v){
+            switch (v.getId()) {
+                case R.id.button:
+                    openSettings();
+                case R.id.button2:
+                    viewTrustedContacts();
+                case R.id.button3:
+                    viewActiveWalkers();
+                case R.id.button4:
+                    openWalking();
+            }
+        }
+
+    protected void openSettings(){
+        Intent openSettings = new Intent(this, SettingsActivity.class);
+        startActivity(openSettings);
+    }
+
+    protected void viewTrustedContacts() {
+        Intent openContacts = new Intent (this, TrustedContacts.class);
+        startActivity(openContacts);
+    }
+
+    protected void viewActiveWalkers() {
+        Intent viewWalkers = new Intent (this, FocusView.class);
+        startActivity(viewWalkers);
+    }
+
+    protected void openWalking(){
+        Intent openWalking = new Intent(this, WalkingActivity.class);
+        startActivity(openWalking);
+    }
 
     /**
      * Manipulates the map once available.
@@ -77,7 +119,7 @@ public class MainMenu extends FragmentActivity implements GoogleMap.OnMyLocation
      * installed Google Play services and returned to the app.
      */
     @Override
-    public void onMapReady(GoogleMap googleMap) { 
+    public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         // Get users last location to show on map
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -166,9 +208,9 @@ public class MainMenu extends FragmentActivity implements GoogleMap.OnMyLocation
 
     private void networkTest() {
         RequestQueue queue = Volley.newRequestQueue(this);
-        String ip = "0.0.0.0"; // Replace this with your own
+        String ip = "138.38.149.100"; // Replace this with your own
         String port = "5000"; // Usually this
-        String url = "https://" + ip + ":" + port + "/ping";
+        String url = "http://" + ip + ":" + port + "/ping";
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -176,7 +218,7 @@ public class MainMenu extends FragmentActivity implements GoogleMap.OnMyLocation
                     @Override
                     public void onResponse(String response) {
                         // Display the first 500 characters of the response string.
-                        alertDialog("Network Connection Success!", response.substring(0, 500));
+                        alertDialog("Network Connection Success!", response);
                     }
                 }, new Response.ErrorListener() {
             @Override
