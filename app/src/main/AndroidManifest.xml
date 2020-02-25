@@ -17,6 +17,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".TrustedContacts"
+            android:label="@string/title_activity_trusted_contacts"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
             android:name=".AlarmActivity"
             android:label="@string/title_activity_alarm"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -37,7 +41,8 @@
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
