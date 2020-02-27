@@ -17,7 +17,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".TrustedContactList"></activity>
+        <activity android:name=".ContactInfo"></activity>
+        <activity android:name=".TrustedContactList" />
         <activity
             android:name=".TrustedContacts"
             android:label="@string/title_activity_trusted_contacts"
