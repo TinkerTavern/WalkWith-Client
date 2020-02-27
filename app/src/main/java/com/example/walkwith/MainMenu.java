@@ -33,12 +33,14 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 
 import java.util.Objects;
 
 public class MainMenu extends FragmentActivity implements View.OnClickListener, GoogleMap.OnMyLocationButtonClickListener,
-        GoogleMap.OnMyLocationClickListener,
+        GoogleMap.OnMyLocationClickListener, TaskLoadedCallback,
         OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     private GoogleMap mMap;
     private int MY_LOCATION_REQUEST_CODE = 1;
@@ -48,6 +50,10 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
     private Marker mFriendTwo;
     private Marker mFriendThree;
 
+    private MarkerOptions place1, place2;
+
+    Polyline route;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +62,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
         try {
             Objects.requireNonNull(mapFragment).getMapAsync(this);
@@ -81,6 +88,9 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         viewTrustedContacts.setOnClickListener(this);
         viewActiveWalkers.setOnClickListener(this);
         startNewWalk.setOnClickListener(this);
+
+        place1 = new MarkerOptions().position(new LatLng(27.658143, 85.3199503)).title("Location 1");
+        place2 = new MarkerOptions().position(new LatLng(27.667491, 85.3208583)).title("Location 2");
     }
 
         @Override
@@ -163,6 +173,26 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         mFriendThree.setTag(0);
 
         mMap.setOnMarkerClickListener(this);
+
+        String url = getUrl(place1.getPosition(), place2.getPosition(), "walking");
+
+        //UNCOMMENT THIS TO SHOW ROUTE BETWEEN 2 POINTS
+        //new FetchURL(MainMenu.this).execute(url,"walking");
+
+        //Simple line between 2 points
+        Polyline polyline1 = mMap.addPolyline(new PolylineOptions()
+                .clickable(true)
+                .add(
+                        new LatLng(51, 2.3),
+                        new LatLng(51, 2.6)));
+
+        mMap.addMarker(place1);
+        mMap.addMarker(place2);
+
+        // Set listeners for click events.
+        /*googleMap.setOnPolylineClickListener(this);
+        googleMap.setOnPolygonClickListener(this);*/
+
     }
 
     @Override
@@ -288,5 +318,28 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
     public boolean onMarkerClick(Marker marker) {
         Toast.makeText(this, "Friend button clicked", Toast.LENGTH_SHORT).show();
         return false;
+    }
+
+    private String getUrl(LatLng origin, LatLng dest, String directionMode) {
+        // Origin of route
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+        // Destination of route
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+        // Mode
+        String mode = "mode=" + directionMode;
+        // Building the parameters to the web service
+        String parameters = str_origin + "&" + str_dest + "&" + mode;
+        // Output format
+        String output = "json";
+        // Building the url to the web service
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + "AIzaSyBduaZIXEGGMPnEXcYQERJS5pFOvCG0i20";
+        return url;
+    }
+
+    @Override
+    public void onTaskDone(Object... values) {
+        if (route != null)
+            route.remove();
+        route = mMap.addPolyline((PolylineOptions) values[0]);
     }
 }
