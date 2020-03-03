@@ -15,7 +15,7 @@ public class TrustedContacts extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_trusted_contacts);
+//        setContentView(R.layout.activity_trusted_contacts);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
