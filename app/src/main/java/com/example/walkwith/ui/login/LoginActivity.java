@@ -5,6 +5,7 @@ import android.app.Activity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -23,8 +24,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.walkwith.MainMenu;
 import com.example.walkwith.R;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -126,6 +136,13 @@ public class LoginActivity extends AppCompatActivity {
                         passwordEditText.getText().toString());
             }
         });
+
+        forgotPasswordButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendPost("Change Password", getApplicationContext());
+            }
+        });
     }
 
     private void updateUiWithUser(LoggedInUserView model) {
@@ -137,5 +154,38 @@ public class LoginActivity extends AppCompatActivity {
 
     private void showLoginFailed(@StringRes Integer errorString) {
         Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_SHORT).show();
+    }
+
+    private void sendPost(String x, final Context parentContext) {
+        RequestQueue queue = Volley.newRequestQueue(parentContext);
+        String ip = "138.38.223.205";
+        String port = "5000";
+        String url = "http://" + ip + ":" + port + "/account";
+
+        try {
+            JSONObject jsonBody = new JSONObject();
+            jsonBody.put("mode", "login");
+            jsonBody.put("email", "email");
+            jsonBody.put("password", "pass");
+
+            JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        response.get("result");
+                    } catch (JSONException e) {
+                        e.getMessage();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    error.getMessage();
+                }
+            });
+            queue.add(jsonObject);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }
