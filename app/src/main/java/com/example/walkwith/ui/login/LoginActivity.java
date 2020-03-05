@@ -156,7 +156,7 @@ public class LoginActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_SHORT).show();
     }
 
-    private void sendPost(String x, final Context parentContext) {
+    private void sendPost(String value, final Context parentContext) {
         RequestQueue queue = Volley.newRequestQueue(parentContext);
         String ip = "138.38.223.205";
         String port = "5000";
@@ -164,9 +164,9 @@ public class LoginActivity extends AppCompatActivity {
 
         try {
             JSONObject jsonBody = new JSONObject();
-            jsonBody.put("mode", "login");
-            jsonBody.put("email", "email");
-            jsonBody.put("password", "pass");
+            jsonBody.put("mode", "changePass");
+            jsonBody.put("email", "");
+            jsonBody.put("password", "");
 
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
                 @Override
