@@ -271,7 +271,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
 
     private void networkTest() {
         RequestQueue queue = Volley.newRequestQueue(this);
-        String ip = "138.38.149.100"; // Replace this with your own
+        String ip = "138.38.194.92"; // Replace this with your own
         String port = "5000"; // Usually this
         String url = "http://" + ip + ":" + port + "/ping";
 
@@ -333,6 +333,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         String output = "json";
         // Building the url to the web service
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + "AIzaSyBduaZIXEGGMPnEXcYQERJS5pFOvCG0i20";
+        //TODO Why is the key written here in plaintext?
         return url;
     }
 
