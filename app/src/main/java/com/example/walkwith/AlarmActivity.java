@@ -39,9 +39,7 @@ public class AlarmActivity extends AppCompatActivity {
     }
     protected void sendPost(String x, Context y) {
         RequestQueue queue = Volley.newRequestQueue(y);
-        String ip = "138.38.223.205";
-        String port = "5000";
-        String url = "http:///" + ip + ":" + port + "/account";
+        String url = getResources().getString(R.string.server_ip) + "/alarm";
         JSONObject jsonBody = new JSONObject();
 
         try {

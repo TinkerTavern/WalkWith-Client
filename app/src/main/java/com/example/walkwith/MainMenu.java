@@ -76,9 +76,6 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
 
         Toast toast = Toast.makeText(context, text, duration);
         toast.show();
-        // New network test to see if server works
-        networkTest();
-
         Button viewSettings = findViewById(R.id.button); //Settings button
         Button viewTrustedContacts = findViewById(R.id.button2); //Trusted Contacts button
         Button viewActiveWalkers = findViewById(R.id.button3); //Active Walkers button
@@ -267,30 +264,6 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
             final AlertDialog alert = builder.create();
             alert.show();
         }
-    }
-
-    private void networkTest() {
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String ip = "138.38.194.92"; // Replace this with your own
-        String port = "5000"; // Usually this
-        String url = "http://" + ip + ":" + port + "/ping";
-
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
-                        alertDialog("Network Connection Success!", response);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                alertDialog("Network connection failed", "Reason: " + error);
-            }
-        });
-        // Add the request to the RequestQueue.
-        queue.add(stringRequest);
     }
 
     private void alertDialog(final String title, final String message) {
