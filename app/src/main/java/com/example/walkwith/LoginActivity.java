@@ -36,7 +36,7 @@ public class LoginActivity extends AppCompatActivity {
         final Button forgotPasswordButton = findViewById(R.id.forgotPassword);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+            public void onClick(View v) { // TODO: (Re)implement loading icon for screen
                 sendAccountPOST("login", usernameEditText.getText().toString(),
                         passwordEditText.getText().toString());
             }
@@ -97,8 +97,10 @@ public class LoginActivity extends AppCompatActivity {
 
     private void validateLogin(String response) {
         if (response.equals("True")) {
-            Toast.makeText(this, "Welcome, " + usernameEditText.getText().toString(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Welcome, " + usernameEditText.getText().toString(),
+                    Toast.LENGTH_SHORT).show();
             Intent myIntent = new Intent(LoginActivity.this, MainMenu.class);
+            // TODO: Pass in user information into screen
             finish();
             LoginActivity.this.startActivity(myIntent);
         }
