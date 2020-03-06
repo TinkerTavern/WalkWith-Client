@@ -54,7 +54,7 @@ public class AlarmActivity extends AppCompatActivity {
                         response.get("result");
                         // success
                     } catch (JSONException e) {
-                        // u fked up
+                        // Error
                         e.getMessage();
                     }
                 }
