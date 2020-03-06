@@ -9,6 +9,7 @@
     <string name="title_activity_focus">Focus Menu</string>
     <string name="title_activity_register">Sign Up</string>
     <string name="title_activity_walking">Walk Menu</string>
+    <string name="server_ip">https://walkwithserver.appspot.com/</string>
 
 
     <!-- Preference Titles -->
