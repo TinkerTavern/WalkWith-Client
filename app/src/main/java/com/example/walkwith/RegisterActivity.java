@@ -81,7 +81,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void sendRegisterRequest(String firstName, String lastName, String email, String password) {
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        String url = getResources().getString(R.string.server_ip) + "/account";
+        String url = getResources().getString(R.string.server_ip) + "account";
 
 
         try {
@@ -101,7 +101,7 @@ public class RegisterActivity extends AppCompatActivity {
                         validateLogin((String) response.get("result"));
                         // Put the things you want to happen upon success
                     } catch (JSONException e) {
-                        validateLogin(e.getMessage());
+                        validateLogin("JSON Error - " + e.getMessage());
                         // Put the error here
                     }
                 }
@@ -109,7 +109,7 @@ public class RegisterActivity extends AppCompatActivity {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     // put the error here
-                    validateLogin(error.getMessage());
+                    validateLogin("Server Error - " + error.getMessage());
                 }
             });
             // Add the request to the RequestQueue.
@@ -117,7 +117,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         } catch (
                 JSONException e) {
-            validateLogin(e.getMessage());
+            validateLogin("Error - " + e.getMessage());
         }
     }
 

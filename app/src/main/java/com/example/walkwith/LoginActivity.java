@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void sendAccountPOST(String mode, String email, String password) {
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        String url = getResources().getString(R.string.server_ip) + "/account";
+        String url = getResources().getString(R.string.server_ip) + "account";
         try {
             JSONObject jsonBody = new JSONObject();
 
