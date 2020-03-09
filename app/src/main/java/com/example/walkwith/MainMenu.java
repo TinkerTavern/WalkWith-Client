@@ -114,7 +114,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
     }
 
     protected void viewTrustedContacts() {
-        Intent openContacts = new Intent (this, TrustedContacts.class);
+        Intent openContacts = new Intent (this, TrustedContactList.class);
         startActivity(openContacts);
     }
 
