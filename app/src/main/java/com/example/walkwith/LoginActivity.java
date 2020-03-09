@@ -51,8 +51,8 @@ public class LoginActivity extends AppCompatActivity {
 
         forgotPasswordButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) { // TODO: Do forgot passwords correctly
-                sendAccountPOST("changePass", usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString());
+                Intent myIntent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+                LoginActivity.this.startActivity(myIntent);
             }
         });
     }
