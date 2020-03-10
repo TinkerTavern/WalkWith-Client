@@ -10,7 +10,7 @@
     <string name="title_activity_register">Sign Up</string>
     <string name="title_activity_walking">Walk Menu</string>
     <string name="server_ip">https://walkwithserver.appspot.com/</string>
-
+    <string name="add_contact_button">Add Trusted Contact</string>
 
     <!-- Preference Titles -->
 
