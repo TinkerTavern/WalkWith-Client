@@ -6,13 +6,17 @@
     android:layout_height="match_parent"
     tools:context=".WalkingActivity">
 
-    <com.google.android.gms.maps.MapView
+
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/mapView2"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="0dp"
         android:layout_height="606dp"
-        app:layout_constraintBaseline_toBaselineOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:context=".WalkingActivity" />
 
     <SearchView
         android:id="@+id/searchView"

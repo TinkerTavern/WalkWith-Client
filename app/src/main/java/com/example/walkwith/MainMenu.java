@@ -66,7 +66,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.mapView2);
+                .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         try {

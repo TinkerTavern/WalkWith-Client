@@ -43,7 +43,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_walking);
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(R.id.mapView2);
         mapFragment.getMapAsync(this);
 
         Button alarmButton = findViewById(R.id.alarm_button);
