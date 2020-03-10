@@ -22,6 +22,8 @@ import org.json.JSONObject;
 
 public class AlarmActivity extends AppCompatActivity {
 
+    private AccountInfo accountInfo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,40 +35,38 @@ public class AlarmActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendPost("hi", getApplicationContext());
+                sendPOST(accountInfo.getEmail());
             }
         });
     }
-    protected void sendPost(String x, Context y) {
-        RequestQueue queue = Volley.newRequestQueue(y);
-        String url = getResources().getString(R.string.server_ip) + "/alarm";
-        JSONObject jsonBody = new JSONObject();
 
+    private void sendPOST(String email) {
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        String url = getResources().getString(R.string.server_ip) + "alarm";
         try {
-            jsonBody.put("mode", "login");
-            jsonBody.put("email", "email");
-            jsonBody.put("password", "pass");
+            JSONObject jsonBody = new JSONObject();
+
+            jsonBody.put("email", email);
 
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
                         response.get("result");
-                        // success
                     } catch (JSONException e) {
-                        // Error
                         e.getMessage();
                     }
                 }
-            },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            error.getMessage();
-                        }
-                    });
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    error.getMessage();
+                }
+            });
             queue.add(jsonObject);
-        } catch (JSONException e) {
+
+        } catch (
+                JSONException e) {
             e.printStackTrace();
         }
     }
