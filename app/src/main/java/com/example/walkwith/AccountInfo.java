@@ -1,26 +1,25 @@
 package com.example.walkwith;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class AccountInfo {
-    private String username;
-    private String email;
-    private List<String> friendsList;
-    private String friendFocusedOn;
+    private static String username;
+    private static String email;
+    private static ArrayList<String> friendsList;
+    private static String friendFocusedOn;
 
-    AccountInfo(String username, String email){
-        this.username = username;
-        this.email = email;
-        friendsList = new ArrayList<String>();
+    AccountInfo(/*String username,*/ String email, ArrayList<String> friendsList){
+        //this.username = username;
+        AccountInfo.email = email;
+        AccountInfo.friendsList = friendsList;
     }
 
-    public String getEmail() {
+    public static String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        AccountInfo.email = email;
     }
 
     public String getUsername() {
@@ -28,24 +27,27 @@ public class AccountInfo {
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        AccountInfo.username = username;
     }
 
-    public List<String> getFriendsList() {
+    public static ArrayList<String> getFriendsList() {
         return friendsList;
     }
 
-    public String[] convertToArray(List<String> list){
-        String[] newList = new String[list.size()];
-        list.toArray(newList);
-        return newList;
+    public static String[] convertToArray(ArrayList<String> list){
+        if(!list.isEmpty()){
+            String[] newList = new String[list.size()];
+            list.toArray(newList);
+            return newList;
+        }
+        return new String[0];
     }
 
-    public String getFriendFocusedOn() {
+    public static String getFriendFocusedOn() {
         return friendFocusedOn;
     }
 
-    public void setFriendFocusedOn(String friendFocusedOn) {
-        this.friendFocusedOn = friendFocusedOn;
+    public static void setFriendFocusedOn(String friendFocusedOn) {
+        AccountInfo.friendFocusedOn = friendFocusedOn;
     }
 }

@@ -51,20 +51,14 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
     private int MY_LOCATION_REQUEST_CODE = 1;
 
     //Random Friends
-
     private MarkerOptions place1, place2;
 
     Polyline route;
-
-    private AccountInfo accountInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
-
-        accountInfo = new AccountInfo("test","test@bath.ac.uk");
-        //TODO Send request to get account info
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -159,11 +153,13 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
 
         //Adding friends to map
 
-        //UNCOMMENT THIS TO USE ACTUAL FRIEND'S AND USER DETAILS
-        //sendPOST("Idle", accountInfo.getEmail(), accountInfo.convertToArray(accountInfo.getFriendsList()));
+        //TODO UNCOMMENT THIS TO USE ACTUAL FRIEND'S AND USER DETAILS
+        Toast.makeText(this, "Hello, " + AccountInfo.getEmail(),
+                Toast.LENGTH_SHORT).show();
+        sendPOST("Idle", AccountInfo.getEmail(), AccountInfo.convertToArray(AccountInfo.getFriendsList()));
 
         //This is for testing use line up top
-        displayTrustedContactLoc(new String[]{"a", "b", "c"}, new int[]{52, 32, 76}, new double[]{2.1, 3.2, 4.3});
+        //displayTrustedContactLoc(new String[]{"a", "b", "c"}, new int[]{52, 32, 76}, new double[]{2.1, 3.2, 4.3});
 
         mMap.setOnMarkerClickListener(this);
 
@@ -285,7 +281,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        accountInfo.setFriendFocusedOn(marker.getTitle());
+        AccountInfo.setFriendFocusedOn(marker.getTitle());
         Intent focusView = new Intent (this, FocusView.class);
         startActivity(focusView);
         return false;

@@ -30,8 +30,6 @@ import java.util.Objects;
 public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener, OnMapReadyCallback {
     private GoogleMap mMap;
 
-    private AccountInfo accountInfo;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +52,8 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
 
-        //sendPOST("Focus", accountInfo.getEmail(), new String[]{accountInfo.getFriendFocusedOn()});
+        //TODO Uncomment this
+        sendPOST("Focus", AccountInfo.getEmail(), new String[]{AccountInfo.getFriendFocusedOn()});
 
         //This is for testing use line up top
         //displayFocusedLoc(new String[]{accountInfo.getFriendFocusedOn()}, new int[]{52}, new double[]{2.1});

@@ -22,7 +22,6 @@ import org.json.JSONObject;
 
 public class AlarmActivity extends AppCompatActivity {
 
-    private AccountInfo accountInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +34,7 @@ public class AlarmActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendPOST(accountInfo.getEmail());
+                sendPOST(AccountInfo.getEmail());
             }
         });
     }
