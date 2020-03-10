@@ -126,7 +126,7 @@ public class LoginActivity extends AppCompatActivity {
         try {
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("email", email);
-            jsonBody.put("viewingMode", mode);
+            jsonBody.put("mode", mode);
 
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
                 @Override

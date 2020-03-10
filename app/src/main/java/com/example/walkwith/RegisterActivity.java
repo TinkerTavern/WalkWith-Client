@@ -29,6 +29,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText confirmEmailEditText;
     private EditText passwordEditText;
     private EditText confirmPasswordEditText;
+    private EditText phoneNumberEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +46,7 @@ public class RegisterActivity extends AppCompatActivity {
         confirmEmailEditText = findViewById(R.id.confirm_email);
         passwordEditText = findViewById(R.id.password);
         confirmPasswordEditText = findViewById(R.id.confirm_password);
+        phoneNumberEditText = findViewById(R.id.phone_number);
 
         final Button registerButton = findViewById(R.id.register);
         final Button gotAccountButton = findViewById(R.id.gotAccount);
@@ -70,7 +72,7 @@ public class RegisterActivity extends AppCompatActivity {
                     confirmPasswordEditText.getText().toString()))
                 // Passwords same
                 sendRegisterRequest(firstNameEditText.getText().toString(), lastNameEditText.getText().toString(), emailEditText.getText().toString(),
-                passwordEditText.getText().toString());
+                passwordEditText.getText().toString(), phoneNumberEditText.getText().toString());
             else
                 Toast.makeText(this, "Passwords don't match", Toast.LENGTH_SHORT)
                         .show();
@@ -79,7 +81,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
-    private void sendRegisterRequest(String firstName, String lastName, String email, String password) {
+    private void sendRegisterRequest(String firstName, String lastName, String email, String password, String phone) {
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String url = getResources().getString(R.string.server_ip) + "account";
 
@@ -92,6 +94,7 @@ public class RegisterActivity extends AppCompatActivity {
             jsonBody.put("lastName", lastName);
             jsonBody.put("email", email);
             jsonBody.put("password", password);
+            jsonBody.put("phoneNumber", phone);
             // Put your headers here
 
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {

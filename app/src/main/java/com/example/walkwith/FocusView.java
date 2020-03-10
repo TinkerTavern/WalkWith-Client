@@ -98,13 +98,16 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
 
     private void displayFocusedLoc(String[] emails, int[] lats, double[] longs) {
         Marker mFriend;
-
+        //int focusedOnIndex = 0;
         for(int i = 0; i < emails.length; i++){
+//            if(AccountInfo.getFriendFocusedOn().equals(emails[i]))
+//                focusedOnIndex = i;
             mFriend = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(lats[i], longs[i]))
                     .title(emails[i])
             );
             mFriend.setTag(0);
+            moveToCurrentLocation(lats[i], longs[i]);
         }
     }
 

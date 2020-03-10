@@ -67,13 +67,27 @@
         android:inputType="textEmailAddress" />
 
     <EditText
-        android:id="@+id/password"
+        android:id="@+id/phone_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="97dp"
         android:layout_marginTop="300dp"
+        android:autofillHints="True"
+        android:backgroundTint="#F44336"
+        android:ems="10"
+        android:hint="@string/phone_number"
+        android:inputType="phone" />
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="97dp"
+        android:layout_marginTop="350dp"
         android:backgroundTint="#F44336"
         android:ems="10"
         android:autofillHints="True"
@@ -87,7 +101,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="97dp"
-        android:layout_marginTop="350dp"
+        android:layout_marginTop="400dp"
         android:backgroundTint="#F44336"
         android:ems="10"
         android:autofillHints="True"
@@ -102,7 +116,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="97dp"
-        android:layout_marginTop="400dp"
+        android:layout_marginTop="450dp"
         android:background="#F44336"
         android:text="@string/create_account"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
@@ -116,7 +130,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="97dp"
-        android:layout_marginTop="450dp"
+        android:layout_marginTop="500dp"
         android:text="@string/to_login"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="#F44336" />
