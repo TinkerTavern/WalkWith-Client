@@ -16,6 +16,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -24,6 +25,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -36,6 +38,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Objects;
 
@@ -61,7 +66,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(R.id.mapView2);
         mapFragment.getMapAsync(this);
 
         try {
@@ -291,6 +296,78 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
     public boolean onMarkerClick(Marker marker) {
         Toast.makeText(this, "Friend button clicked", Toast.LENGTH_SHORT).show();
         return false;
+    }
+
+    public void sendUpdateWalkPOST(String email, String lon, String lat, String onRoute, final Context parentContext) {
+        RequestQueue queue = Volley.newRequestQueue(parentContext);
+        String ip = "138.38.223.205"; // Replace this with your own
+        String port = "5000"; // Usually this
+        String url = "http://" + ip + ":" + port + "/account";
+
+        try {
+            JSONObject jsonBody = new JSONObject();
+
+            jsonBody.put("email", email);
+            jsonBody.put("long", lon);
+            jsonBody.put("lat", lat);
+            jsonBody.put("onRoute", onRoute);
+            // Put your headers here
+
+            JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                        //TODO update ETA and show new route
+                        // Put the things you want to happen upon success
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // put the error here
+                    // TODO
+                }
+            });
+            // Add the request to the RequestQueue.
+            queue.add(jsonObject);
+
+        } catch (
+                JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendGetUpdatePOST(String email, String viewMode, String watchEmails, final Context parentContext) {
+        RequestQueue queue = Volley.newRequestQueue(parentContext);
+        String ip = "138.38.223.205"; // Replace this with your own
+        String port = "5000"; // Usually this
+        String url = "http://" + ip + ":" + port + "/account";
+
+        try {
+            JSONObject jsonBody = new JSONObject();
+
+            jsonBody.put("email", email);
+            jsonBody.put("viewingMode", viewMode);
+            jsonBody.put("onRoute", watchEmails);
+            // Put your headers here
+
+            JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    //TODO show updated locations
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // put the error here
+                    // TODO
+                }
+            });
+            // Add the request to the RequestQueue.
+            queue.add(jsonObject);
+
+        } catch (
+                JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private String getUrl(LatLng origin, LatLng dest, String directionMode) {
