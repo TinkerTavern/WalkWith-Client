@@ -51,18 +51,20 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
     private int MY_LOCATION_REQUEST_CODE = 1;
 
     //Random Friends
-    private Marker mFriendOne;
-    private Marker mFriendTwo;
-    private Marker mFriendThree;
 
     private MarkerOptions place1, place2;
 
     Polyline route;
 
+    private AccountInfo accountInfo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
+
+        accountInfo = new AccountInfo("test","test@bath.ac.uk");
+        //TODO Send request to get account info
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -155,24 +157,13 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
                     MY_LOCATION_REQUEST_CODE);
         }
 
-        //Adding friend to map
-        mFriendOne = mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(51, 2.3))
-                .title("Friend One")
-        );
-        mFriendOne.setTag(0);
+        //Adding friends to map
 
-        mFriendTwo = mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(51, 2.6))
-                .title("Friend Two")
-        );
-        mFriendTwo.setTag(0);
+        //UNCOMMENT THIS TO USE ACTUAL FRIEND'S AND USER DETAILS
+        //sendPOST("Idle", accountInfo.getEmail(), accountInfo.convertToArray(accountInfo.getFriendsList()));
 
-        mFriendThree = mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(51, 0.1))
-                .title("Friend Three")
-        );
-        mFriendThree.setTag(0);
+        //This is for testing use line up top
+        displayTrustedContactLoc(new String[]{"a", "b", "c"}, new int[]{52, 32, 76}, new double[]{2.1, 3.2, 4.3});
 
         mMap.setOnMarkerClickListener(this);
 
@@ -294,7 +285,9 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        Toast.makeText(this, "Friend button clicked", Toast.LENGTH_SHORT).show();
+        accountInfo.setFriendFocusedOn(marker.getTitle());
+        Intent focusView = new Intent (this, FocusView.class);
+        startActivity(focusView);
         return false;
     }
 
@@ -392,5 +385,52 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         if (route != null)
             route.remove();
         route = mMap.addPolyline((PolylineOptions) values[0]);
+    }
+
+    private void sendPOST(String mode, String email, final String [] watchEmails) {
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        String url = getResources().getString(R.string.server_ip) + "account";
+        try {
+            JSONObject jsonBody = new JSONObject();
+
+            jsonBody.put("email", email);
+            jsonBody.put("viewingMode", mode);
+            jsonBody.put("watchEmails", watchEmails);
+
+            JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        double[] Longs = (double[]) response.get("longs");
+                        int[] Lats = (int[]) response.get("lats");
+                        displayTrustedContactLoc(watchEmails, Lats, Longs);
+                    } catch (JSONException e) {
+                        e.getMessage();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    error.getMessage();
+                }
+            });
+            queue.add(jsonObject);
+
+        } catch (
+                JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void displayTrustedContactLoc(String[] emails, int[] lats, double[] longs){
+        Marker mFriend;
+
+        for(int i = 0; i < emails.length; i++){
+            mFriend = mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(lats[i], longs[i]))
+                    .title(emails[i])
+            );
+            mFriend.setTag(0);
+        }
     }
 }
