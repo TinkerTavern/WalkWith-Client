@@ -156,7 +156,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         //TODO UNCOMMENT THIS TO USE ACTUAL FRIEND'S AND USER DETAILS
         Toast.makeText(this, "Hello, " + AccountInfo.getEmail(),
                 Toast.LENGTH_SHORT).show();
-        sendPOST("Idle", AccountInfo.getEmail(), AccountInfo.convertToArray(AccountInfo.getFriendsList()));
+//        sendPOST("Idle", AccountInfo.getEmail(), AccountInfo.convertToArray(AccountInfo.getFriendsList()));
 
         //This is for testing use line up top
         //displayTrustedContactLoc(new String[]{"a", "b", "c"}, new int[]{52, 32, 76}, new double[]{2.1, 3.2, 4.3});
