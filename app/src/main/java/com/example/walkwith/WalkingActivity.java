@@ -26,21 +26,34 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class WalkingActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     GoogleMap gMap;
     SearchView searchView;
+    Button alarmButton, startWalk, finishWalk;
     SupportMapFragment mapFragment;
+    boolean active,onRoute;
+    LatLng currentLocation, destination;
+    String email,mode;
+    Polyline route;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +62,47 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapView2);
         mapFragment.getMapAsync(this);
+        active = false;
+        onRoute = false;
 
         Button alarmButton = findViewById(R.id.alarm_button);
         alarmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openAlarm();
+            }
+        });
+
+        startWalk = findViewById(R.id.start_walk);
+        startWalk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                active = true;
+                onRoute = true;
+                Log.d("test", "onClick: ");
+                //todo set visibility of different panels
+                ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
+                exec.scheduleAtFixedRate(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (active) {
+                            getUserLocation();
+                            //todo check if on route
+                            sendUpdateWalkPOST(email,Double.toString(currentLocation.latitude),Double.toString(currentLocation.longitude), Boolean.toString(onRoute));
+                        }
+
+                    }
+                }, 0, 5, TimeUnit.SECONDS);
+            }
+        });
+
+        finishWalk = findViewById(R.id.alarm_button);
+        finishWalk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                active = false;
+                //todo switch panels
+                route.setVisible(false);
             }
         });
 
@@ -65,8 +113,9 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             public boolean onQueryTextSubmit(String query) {
                 String location = searchView.getQuery().toString();
                 List<Address> list = null;
-
+                Log.d("test1","before");
                 Geocoder geocoder = new Geocoder(WalkingActivity.this);
+                Log.d("test2","after");
 
                 try {
                     list = geocoder.getFromLocationName(location, 1);
@@ -74,10 +123,18 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                     e.printStackTrace();
                 }
 
-                Address destination = list.get(0);
-                //todo something with the location
+                if (list!=null&&!list.isEmpty()) {
+                    Address address = list.get(0);
+                    destination = new LatLng(address.getLatitude(),address.getLongitude());
+                    Marker marker = gMap.addMarker(new MarkerOptions().position(destination).title(location));
+                    gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destination,10));
+                    sendDetermineRoutePOST(email,mode,Double.toString(currentLocation.latitude),Double.toString(currentLocation.longitude),Double.toString(destination.latitude),Double.toString(destination.longitude));
+                }
+                else {
+                    Log.d("test","failed attempt");
+                }
 
-                return false;
+                return true;
             }
 
             @Override
@@ -96,11 +153,9 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         gMap = googleMap;
     }
 
-    public void sendUpdateWalkPOST(String email, String mode, String aLon,String aLat,String bLon,String bLat, final Context parentContext) {
-        RequestQueue queue = Volley.newRequestQueue(parentContext);
-        String ip = "138.38.223.205"; // Replace this with your own
-        String port = "5000"; // Usually this
-        String url = "http://" + ip + ":" + port + "/account";
+    public void sendDetermineRoutePOST(String email, String mode, String aLon,String aLat,String bLon,String bLat) {
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        String url = getResources().getString(R.string.server_ip) + "account";
 
         try {
             JSONObject jsonBody = new JSONObject();
@@ -110,19 +165,62 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             jsonBody.put("aLong", aLon);
             jsonBody.put("aLat", aLat);
             jsonBody.put("bLong", bLon);
-            jsonBody.put("bLat", aLat);
+            jsonBody.put("bLat", bLat);
             // Put your headers here
 
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    //TODO start walk
+                    openMenu();
+                    showRoute();
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     // put the error here
-                    // TODO
+                }
+            });
+            // Add the request to the RequestQueue.
+            queue.add(jsonObject);
+
+        } catch (
+                JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showRoute()
+    {
+        //todo
+    }
+
+    private void openMenu()
+    {
+
+    }
+
+    public void sendUpdateWalkPOST(String email, String lon, String lat, String onRoute) {
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        String url = getResources().getString(R.string.server_ip) + "account";
+
+        try {
+            JSONObject jsonBody = new JSONObject();
+
+            jsonBody.put("email", email);
+            jsonBody.put("long", lon);
+            jsonBody.put("lat", lat);
+            jsonBody.put("onRoute", onRoute);
+            // Put your headers here
+
+            JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    //TODO update ETA and show new route
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // put the error here
                 }
             });
             // Add the request to the RequestQueue.
@@ -140,7 +238,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
             if (location != null) {
                 double lat = location.getLatitude(), lon = location.getLongitude();
-                // TODO Update map or do what you want with it here.
+                currentLocation = new LatLng(lat,lon);
             } else {
                 // Gone wrong
                 Toast.makeText(this, "Error in getting location",
