@@ -1,4 +1,5 @@
-# Built application files
+# Built application filesthspec '.idea/libraries/Gradle__androidx_activity_activity_1_1_0_aar.xml' did not match any files
+
 /*/build/
 
 # Crashlytics configuations
@@ -25,6 +26,7 @@ local.properties
 .idea/modules.xml
 .idea/scopes/scope_settings.xml
 .idea/vcs.xml
+.idea/caches/
 app/app.iml
 *.iml
 
@@ -37,3 +39,5 @@ app/app.iml
 ehthumbs.db
 Thumbs.db
 app/src/debug/res/values/google_maps_api.xml
+build.gradle
+
