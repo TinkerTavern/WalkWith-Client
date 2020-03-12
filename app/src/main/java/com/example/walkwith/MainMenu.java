@@ -29,6 +29,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import com.example.walkwith.utils.Utilities;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -39,6 +40,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,6 +56,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
     private MarkerOptions place1, place2;
 
     Polyline route;
+    Thread trustThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,27 +90,42 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         viewActiveWalkers.setOnClickListener(this);
         startNewWalk.setOnClickListener(this);
 
+        trustThread = new  Thread() {
+            public void run() {
+                // do stuff
+                while (true) {
+                    sendPOST("Idle", AccountInfo.getEmail());
+                    try {
+                        Thread.sleep(Integer.parseInt(getResources().getString(R.string.idleTimer)));
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
+            }
+        };
+        trustThread.start();
+
         place1 = new MarkerOptions().position(new LatLng(27.658143, 85.3199503)).title("Location 1");
         place2 = new MarkerOptions().position(new LatLng(27.667491, 85.3208583)).title("Location 2");
     }
 
-        @Override
-        public void onClick(View v){
-            switch (v.getId()) {
-                case R.id.button:
-                    openSettings();
-                    break;
-                case R.id.button2:
-                    viewTrustedContacts();
-                    break;
-                case R.id.button3:
-                    viewActiveWalkers();
-                    break;
-                case R.id.button4:
-                    openWalking();
-                    break;
-            }
+    @Override
+    public void onClick(View v){
+        switch (v.getId()) {
+            case R.id.button:
+                openSettings();
+                break;
+            case R.id.button2:
+                viewTrustedContacts();
+                break;
+            case R.id.button3:
+                viewActiveWalkers();
+                break;
+            case R.id.button4:
+                openWalking();
+                break;
         }
+    }
 
     protected void openSettings(){
         Intent openSettings = new Intent(this, SettingsActivity.class);
@@ -156,7 +174,6 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         //TODO UNCOMMENT THIS TO USE ACTUAL FRIEND'S AND USER DETAILS
         Toast.makeText(this, "Hello, " + AccountInfo.getEmail(),
                 Toast.LENGTH_SHORT).show();
-//        sendPOST("Idle", AccountInfo.getEmail(), AccountInfo.convertToArray(AccountInfo.getFriendsList()));
 
         //This is for testing use line up top
         //displayTrustedContactLoc(new String[]{"a", "b", "c"}, new int[]{52, 32, 76}, new double[]{2.1, 3.2, 4.3});
@@ -190,7 +207,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
             if (permissions.length == 1 &&
                     permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                    checkIfLocationOn();
+                checkIfLocationOn();
             else
                 Toast.makeText(this, "Location services not allowed, functionality reduced", Toast.LENGTH_LONG).show();
         }
@@ -219,7 +236,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
     public static Boolean isLocationEnabled(Context context)
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        // This is new method provided in API 28
+            // This is new method provided in API 28
             LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
             if (lm != null)
                 return lm.isLocationEnabled();
@@ -227,7 +244,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
                 return false;
         }
         else {
-        // This is Deprecated in API 28
+            // This is Deprecated in API 28
             int mode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE,
                     Settings.Secure.LOCATION_MODE_OFF);
             return  (mode != Settings.Secure.LOCATION_MODE_OFF);
@@ -287,78 +304,6 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         return false;
     }
 
-    public void sendUpdateWalkPOST(String email, String lon, String lat, String onRoute, final Context parentContext) {
-        RequestQueue queue = Volley.newRequestQueue(parentContext);
-        String ip = "138.38.223.205"; // Replace this with your own
-        String port = "5000"; // Usually this
-        String url = "http://" + ip + ":" + port + "/account";
-
-        try {
-            JSONObject jsonBody = new JSONObject();
-
-            jsonBody.put("email", email);
-            jsonBody.put("long", lon);
-            jsonBody.put("lat", lat);
-            jsonBody.put("onRoute", onRoute);
-            // Put your headers here
-
-            JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                        //TODO update ETA and show new route
-                        // Put the things you want to happen upon success
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    // put the error here
-                    // TODO
-                }
-            });
-            // Add the request to the RequestQueue.
-            queue.add(jsonObject);
-
-        } catch (
-                JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void sendGetUpdatePOST(String email, String viewMode, String watchEmails, final Context parentContext) {
-        RequestQueue queue = Volley.newRequestQueue(parentContext);
-        String ip = "138.38.223.205"; // Replace this with your own
-        String port = "5000"; // Usually this
-        String url = "http://" + ip + ":" + port + "/account";
-
-        try {
-            JSONObject jsonBody = new JSONObject();
-
-            jsonBody.put("email", email);
-            jsonBody.put("viewingMode", viewMode);
-            jsonBody.put("onRoute", watchEmails);
-            // Put your headers here
-
-            JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    //TODO show updated locations
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    // put the error here
-                    // TODO
-                }
-            });
-            // Add the request to the RequestQueue.
-            queue.add(jsonObject);
-
-        } catch (
-                JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
     private String getUrl(LatLng origin, LatLng dest, String directionMode) {
         // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
@@ -383,23 +328,23 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         route = mMap.addPolyline((PolylineOptions) values[0]);
     }
 
-    private void sendPOST(String mode, String email, final String [] watchEmails) {
+    private void sendPOST(String mode, String email) {
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        String url = getResources().getString(R.string.server_ip) + "account";
+        String url = getResources().getString(R.string.server_ip) + "updateView";
         try {
             JSONObject jsonBody = new JSONObject();
 
             jsonBody.put("email", email);
-            jsonBody.put("viewingMode", mode);
-            jsonBody.put("watchEmails", watchEmails);
 
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        double[] Longs = (double[]) response.get("longs");
-                        int[] Lats = (int[]) response.get("lats");
-                        displayTrustedContactLoc(watchEmails, Lats, Longs);
+
+                        Double[] Longs = Utilities.jsonArrayToList((JSONArray) response.get("longs")).toArray(new Double[0]);
+                        Double[] Lats = Utilities.jsonArrayToList((JSONArray) response.get("lats")).toArray(new Double[0]);
+                        String[] emails = Utilities.jsonArrayToList((JSONArray) response.get("emails")).toArray(new String[0]);
+                        displayTrustedContactLoc(emails, Lats, Longs);
                     } catch (JSONException e) {
                         e.getMessage();
                     }
@@ -418,7 +363,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         }
     }
 
-    private void displayTrustedContactLoc(String[] emails, int[] lats, double[] longs){
+    private void displayTrustedContactLoc(String[] emails, Double[] lats, Double[] longs){
         Marker mFriend;
 
         for(int i = 0; i < emails.length; i++){
