@@ -16,7 +16,6 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -26,7 +25,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import com.example.walkwith.utils.Utilities;
@@ -73,13 +71,6 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         } catch (NullPointerException e) {
             alertDialog("Map loading error", e.getMessage());
         }
-        // Added simple toast
-        Context context = getApplicationContext();
-        CharSequence text = "Welcome to the app!";
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
         Button viewSettings = findViewById(R.id.button); //Settings button
         Button viewTrustedContacts = findViewById(R.id.button2); //Trusted Contacts button
         Button viewActiveWalkers = findViewById(R.id.button3); //Active Walkers button
@@ -94,7 +85,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
             public void run() {
                 // do stuff
                 while (true) {
-                    sendPOST("Idle", AccountInfo.getEmail());
+                    sendPOST(AccountInfo.getEmail());
                     try {
                         Thread.sleep(Integer.parseInt(getResources().getString(R.string.idleTimer)));
                     } catch (InterruptedException e) {
@@ -328,7 +319,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         route = mMap.addPolyline((PolylineOptions) values[0]);
     }
 
-    private void sendPOST(String mode, String email) {
+    private void sendPOST(String email) {
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String url = getResources().getString(R.string.server_ip) + "updateView";
         try {

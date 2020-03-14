@@ -1,7 +1,6 @@
 package com.example.walkwith;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 
 import android.location.Location;

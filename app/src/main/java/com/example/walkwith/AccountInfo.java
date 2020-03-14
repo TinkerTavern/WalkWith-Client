@@ -8,7 +8,7 @@ public class AccountInfo {
     private static ArrayList<String> friendsList;
     private static String friendFocusedOn;
 
-    AccountInfo(/*String username,*/ String email, ArrayList<String> friendsList){
+    public AccountInfo(/*String username,*/ String email, ArrayList<String> friendsList){
         //this.username = username;
         AccountInfo.email = email;
         AccountInfo.friendsList = friendsList;
