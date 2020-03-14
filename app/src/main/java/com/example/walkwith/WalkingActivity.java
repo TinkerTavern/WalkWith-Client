@@ -90,13 +90,14 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
-        finishWalk = findViewById(R.id.alarm_button);
+        finishWalk = findViewById(R.id.finish_walk);
         finishWalk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 active = false;
                 //todo switch panels
-                route.setVisible(false);
+//                route.setVisible(false);
+                // TODO: Uncomment above when route working
             }
         });
 
