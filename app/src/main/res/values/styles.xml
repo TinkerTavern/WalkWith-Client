@@ -13,6 +13,14 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="WWSwitch" parent="Theme.AppCompat.Light">
+        <item name="colorControlActivated">#F44336</item>
+        <item name="colorSwitchThumbNormal">#f1f1f1
+        </item>
+        <item name="android:colorForeground">#42221f1f
+        </item>
+    </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
