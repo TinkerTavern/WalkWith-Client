@@ -94,7 +94,7 @@ public class RegisterActivity extends AppCompatActivity {
             jsonBody.put("lastName", lastName);
             jsonBody.put("email", email);
             jsonBody.put("password", password);
-            jsonBody.put("phoneNumber", phone);
+            jsonBody.put("phoneNum", phone);
             // Put your headers here
 
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
