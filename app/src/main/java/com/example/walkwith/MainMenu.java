@@ -85,7 +85,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
             public void run() {
                 // do stuff
                 while (true) {
-                    sendPOST(AccountInfo.getEmail());
+                    updateViewPOST(AccountInfo.getEmail());
                     try {
                         Thread.sleep(Integer.parseInt(getResources().getString(R.string.idleTimer)));
                     } catch (InterruptedException e) {
@@ -319,7 +319,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         route = mMap.addPolyline((PolylineOptions) values[0]);
     }
 
-    private void sendPOST(String email) {
+    private void updateViewPOST(String email) { // TODO Make this a general function
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String url = getResources().getString(R.string.server_ip) + "updateView";
         try {
