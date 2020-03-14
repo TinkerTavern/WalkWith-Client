@@ -7,21 +7,22 @@
     tools:context=".MainMenu">
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/settings"
         style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="409dp"
+        android:layout_width="match_parent"
         android:layout_height="63dp"
         android:text="@string/title_activity_settings"
         android:textColor="#FF5722"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button2" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/trustedContacts"
         style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="414dp"
+        android:layout_width="match_parent"
         android:layout_height="63dp"
         android:text="@string/title_activity_trusted_contacts"
         android:textColor="#FF5722"
@@ -29,12 +30,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button3" />
+        app:layout_constraintBottom_toTopOf="@+id/settings" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/activeWalkers"
         style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="408dp"
+        android:layout_width="match_parent"
         android:layout_height="63dp"
         android:text="@string/title_activity_active"
         android:textColor="#FF5722"
@@ -42,12 +43,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button4" />
+        app:layout_constraintBottom_toTopOf="@+id/trustedContacts" />
 
     <Button
-        android:id="@+id/button4"
+        android:id="@+id/startWalk"
         style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="414dp"
+        android:layout_width="match_parent"
         android:layout_height="63dp"
         android:text="@string/title_activity_walk"
         android:textColor="#FF5722"
@@ -55,17 +56,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.666"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/map" />
+        app:layout_constraintBottom_toTopOf="@+id/activeWalkers" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="412dp"
-        android:layout_height="473dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/startWalk"
         tools:context=".MapsActivity" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

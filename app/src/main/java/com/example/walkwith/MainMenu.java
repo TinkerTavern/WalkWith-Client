@@ -71,10 +71,10 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         } catch (NullPointerException e) {
             alertDialog("Map loading error", e.getMessage());
         }
-        Button viewSettings = findViewById(R.id.button); //Settings button
-        Button viewTrustedContacts = findViewById(R.id.button2); //Trusted Contacts button
-        Button viewActiveWalkers = findViewById(R.id.button3); //Active Walkers button
-        Button startNewWalk = findViewById(R.id.button4); //New Walk button
+        Button viewSettings = findViewById(R.id.settings); //Settings button
+        Button viewTrustedContacts = findViewById(R.id.trustedContacts); //Trusted Contacts button
+        Button viewActiveWalkers = findViewById(R.id.activeWalkers); //Active Walkers button
+        Button startNewWalk = findViewById(R.id.startWalk); //New Walk button
 
         viewSettings.setOnClickListener(this);
         viewTrustedContacts.setOnClickListener(this);
@@ -106,13 +106,13 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
             case R.id.button:
                 openSettings();
                 break;
-            case R.id.button2:
+            case R.id.trustedContacts:
                 viewTrustedContacts();
                 break;
-            case R.id.button3:
+            case R.id.activeWalkers:
                 viewActiveWalkers();
                 break;
-            case R.id.button4:
+            case R.id.startWalk:
                 openWalking();
                 break;
         }
