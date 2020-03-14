@@ -1,6 +1,11 @@
 package com.example.walkwith;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,15 +16,25 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.settings_activity);
-//        getSupportFragmentManager()
-//                .beginTransaction()
-//                .replace(R.id.settings, new SettingsFragment())
-//                .commit();
-//        ActionBar actionBar = getSupportActionBar();
-//        if (actionBar != null) {
-//            actionBar.setDisplayHomeAsUpEnabled(true);
-//        }
+        setContentView(R.layout.settings_activity);
+
+        final Button logOutButton = findViewById(R.id.logOut);
+
+        logOutButton.setOnClickListener(v -> {
+            SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
+            String isRemember = preferences.getString("remember","");
+            Log.d("test", "here");
+            if (isRemember.equals("true")) {
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("remember", "false");
+                editor.putString("email", "");
+                editor.apply();
+                Log.d("test", "there");
+            }
+            Intent returnToLogin = new Intent(this, LoginActivity.class);
+            startActivity(returnToLogin);
+            finishAffinity(); // Closes all other activities
+        });
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
