@@ -11,6 +11,7 @@
     <string name="title_activity_walking">Walk Menu</string>
     <string name="server_ip">https://walkwithserver.appspot.com/</string>
     <string name="add_contact_button">Add Trusted Contact</string>
+    <string name="remove_contact_button">Remove Trusted Contact</string>
     <string name="focusTimer">5000</string>
     <string name="activeTimer">10000</string>
     <string name="idleTimer">30000</string>

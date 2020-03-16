@@ -23,7 +23,7 @@ public class TrustedContactList extends AppCompatActivity implements MyRecyclerV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trusted_contact_list);
 
-        Button addTC = findViewById(R.id.button);
+        Button addTC = findViewById(R.id.addTCButton);
 
         addTC.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -32,7 +32,7 @@ public class TrustedContactList extends AppCompatActivity implements MyRecyclerV
             }
         });
 
-        Button removeTC = findViewById(R.id.button16);
+        Button removeTC = findViewById(R.id.removeTCButton);
 
         removeTC.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -84,11 +84,18 @@ public class TrustedContactList extends AppCompatActivity implements MyRecyclerV
         removeSingleItem();
     }
 
-    private void removeSingleItem(){
-        openList();
-        trustedContactNames.remove(nameIndex);
-        adapter.notifyItemRemoved(nameIndex);
-        Toast.makeText(this, "You deleted " + adapter.getItem(nameIndex) + " on row number " + nameIndex, Toast.LENGTH_SHORT).show();
+    private void removeSingleItem(){ // Changed this so it removes the first value all the time
+        // I think I see what the intention was here, but realistically the removal should be done in
+        // The contactInfo activity
+//        openList();
+        if (trustedContactNames.size() > 0) {
+            trustedContactNames.remove(0);
+            adapter.notifyItemRemoved(0);
+            Toast.makeText(this, "You deleted " + adapter.getItem(0) +
+                    " on row number " + 0, Toast.LENGTH_SHORT).show();
+        }
+        else
+            Toast.makeText(this, "Nothing to remove", Toast.LENGTH_SHORT).show();
 
     }
 
