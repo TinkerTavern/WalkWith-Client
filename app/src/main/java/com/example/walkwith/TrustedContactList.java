@@ -89,10 +89,11 @@ public class TrustedContactList extends AppCompatActivity implements MyRecyclerV
         // The contactInfo activity
 //        openList();
         if (trustedContactNames.size() > 0) {
-            trustedContactNames.remove(0);
-            adapter.notifyItemRemoved(0);
             Toast.makeText(this, "You deleted " + adapter.getItem(0) +
                     " on row number " + 0, Toast.LENGTH_SHORT).show();
+            trustedContactNames.remove(0);
+            adapter.notifyItemRemoved(0);
+
         }
         else
             Toast.makeText(this, "Nothing to remove", Toast.LENGTH_SHORT).show();
