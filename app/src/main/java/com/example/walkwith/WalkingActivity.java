@@ -3,6 +3,7 @@ package com.example.walkwith;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -28,11 +29,17 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -42,12 +49,13 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
 
     GoogleMap gMap;
     SearchView searchView;
-    Button alarmButton, startWalk, finishWalk;
+    Button alarmButton, startWalk, finishWalk, back;
     SupportMapFragment mapFragment;
     boolean active,onRoute;
     LatLng currentLocation, destination;
     String email,mode;
-    Polyline route;
+    Polyline line;
+    PolylineOptions route;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,14 +64,30 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapView2);
         mapFragment.getMapAsync(this);
+        email = AccountInfo.getEmail();
         active = false;
         onRoute = false;
+        route = new PolylineOptions().
+                geodesic(true).
+                color(Color.BLUE).
+                width(10);
 
-        Button alarmButton = findViewById(R.id.alarm_button);
+        alarmButton = findViewById(R.id.alarm_button);
         alarmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openAlarm();
+            }
+        });
+
+        back = findViewById(R.id.back);
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                destination = null;
+                line.setVisible(false);
+                back.setVisibility(View.GONE);
+                startWalk.setVisibility(View.GONE);
             }
         });
 
@@ -74,7 +98,10 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                 active = true;
                 onRoute = true;
                 Log.d("test", "onClick: ");
-                //todo set visibility of different panels
+                back.setVisibility(View.GONE);
+                startWalk.setVisibility(View.GONE);
+                finishWalk.setVisibility(View.VISIBLE);
+                searchView.setVisibility(View.GONE);
                 ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
                 exec.scheduleAtFixedRate(new Runnable() {
                     @Override
@@ -95,9 +122,9 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onClick(View v) {
                 active = false;
-                //todo switch panels
-//                route.setVisible(false);
-                // TODO: Uncomment above when route working
+                finishWalk.setVisibility(View.GONE);
+                searchView.setVisibility(View.VISIBLE);
+                line.setVisible(false);
             }
         });
 
@@ -106,6 +133,11 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+
+                //TODO make this a thread
+                Log.d("test","start");
+                back.setVisibility(View.VISIBLE);
+                startWalk.setVisibility(View.VISIBLE);
                 String location = searchView.getQuery().toString();
                 List<Address> list = null;
                 Log.d("test1","before");
@@ -137,6 +169,10 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                 return false;
             }
         });
+
+        finishWalk.setVisibility(View.GONE);
+        back.setVisibility(View.GONE);
+        startWalk.setVisibility(View.GONE);
     }
     protected void openAlarm(){
         Intent viewAlarm = new Intent(this, AlarmActivity.class);
@@ -146,11 +182,36 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
     @Override
     public void onMapReady(GoogleMap googleMap) {
         gMap = googleMap;
+        //hardcoded test for the show route method
+        /*getUserLocation();
+        line = gMap.addPolyline(route);
+        MarkerOptions place1 = new MarkerOptions().position(new LatLng(27.658143, 85.3199503)).title("Location 1");
+        MarkerOptions place2 = new MarkerOptions().position(new LatLng(27.667491, 85.3208583)).title("Location 2");
+        gMap.addMarker(place1);
+        gMap.addMarker(place2);
+        String everything = "{\"bounds\": {\"northeast\": {\"lat\": 27.6674286, \"lng\": 85.3213586}, \"southwest\": {\"lat\": 27.6579578, \"lng\": 85.3181149}}, \"copyrights\": \"Map data \\u00a92020\", \"legs\": [{\"distance\": {\"text\": \"1.3 km\", \"value\": 1343}, \"duration\": {\"text\": \"16 mins\", \"value\":\n" +
+                "979}, \"end_address\": \"Hospital Rd, Lalitpur, Nepal\", \"end_location\": {\"lat\": 27.6673604, \"lng\": 85.3208903}, \"start_address\": \"Unnamed Road, Lalitpur 44700, Nepal\", \"start_location\": {\"lat\": 27.6581039, \"lng\": 85.31993609999999}, \"steps\": [{\"distance\":\n" +
+                "{\"text\": \"41 m\", \"value\": 41}, \"duration\": {\"text\": \"1 min\", \"value\": 28}, \"end_location\": {\"lat\": 27.6579578, \"lng\": 85.3203163}, \"html_instructions\": \"Head <b>east</b>\", \"polyline\": {\"points\": \"c~xgDs`wgO@EFYDQJY\"}, \"start_location\": {\"lat\": 27.6581039,\n" +
+                "\"lng\": 85.31993609999999}, \"travel_mode\": \"WALKING\"}, {\"distance\": {\"text\": \"0.1 km\", \"value\": 127}, \"duration\": {\"text\": \"1 min\", \"value\": 81}, \"end_location\": {\"lat\": 27.6590027, \"lng\": 85.32078349999999}, \"html_instructions\": \"Turn <b>left</b>\", \"maneuver\":\n" +
+                "\"turn-left\", \"polyline\": {\"points\": \"g}xgD_cwgO_@[k@Wq@Q]Is@K\"}, \"start_location\": {\"lat\": 27.6579578, \"lng\": 85.3203163}, \"travel_mode\": \"WALKING\"}, {\"distance\": {\"text\": \"0.4 km\", \"value\": 358}, \"duration\": {\"text\": \"4 mins\", \"value\": 260}, \"end_location\":\n" +
+                "{\"lat\": 27.6611848, \"lng\": 85.3181149}, \"html_instructions\": \"Turn left\", \"maneuver\": \"turn-left\", \"polyline\": {\"points\": \"wcygD{ewgOmB`CcBtBKLiAdB_AlAkAzA\"}, \"start_location\": {\"lat\": 27.6590027, \"lng\": 85.32078349999999}, \"travel_mode\": \"WALKING\"},\n" +
+                "{\"distance\": {\"text\": \"0.8 km\", \"value\": 768}, \"duration\": {\"text\": \"10 mins\", \"value\": 572}, \"end_location\": {\"lat\": 27.6673496, \"lng\": 85.3213586}, \"html_instructions\": \"Turn <b>right</b> onto <b>Mahalaxmisthan Rd</b>\", \"maneuver\": \"turn-right\", \"polyline\":\n" +
+                "{\"points\": \"kqygDeuvgOUIUGIIKIMKAAu@s@_@]AAuB_BoBkAKUEEKIIEa@MME]MiASo@Qe@Ii@M_Ca@QEsBi@q@QCA[MICo@WeAc@KE]O\"}, \"start_location\": {\"lat\": 27.6611848, \"lng\": 85.3181149}, \"travel_mode\": \"WALKING\"}, {\"distance\": {\"text\": \"49 m\", \"value\": 49}, \"duration\":\n" +
+                "{\"text\": \"1 min\", \"value\": 38}, \"end_location\": {\"lat\": 27.6673604, \"lng\": 85.3208903}, \"html_instructions\": \"Turn Left\", \"maneuver\": \"turn-left\", \"polyline\": {\"points\": \"}wzgDoiwgOMp@AH@B?@?B@@@@@B?@@B@@@D?@\"}, \"start_location\": {\"lat\": 27.6673496, \"lng\": 85.3213586}, \"travel_mode\": \"WALKING\"}], \"traffic_speed_entry\": [], \"via_waypoint\":\n" +
+                "[]}], \"overview_polyline\": {\"points\": \"c~xgDs`wgOH_@Pk@_@[k@WoA[s@KmB`CoBbCiAdB_AlAkAzAUI_@QYUyAuAuB_BoBkAQ[UOo@S}D}@iDo@eCo@u@Se@Q_DqAOz@@DDJDN\"}, \"summary\": \"Mahalaxmisthan Rd\", \"warnings\": [\"This route may be missing sidewalks or pedestrian paths.\"], \"waypoint_order\": [], \"result\": \"False\"}";
+        try {
+
+            JSONObject data = new JSONObject(everything);
+            showRoute(data);
+        } catch (JSONException e)
+        {
+            e.printStackTrace();
+        }*/
     }
 
     public void sendDetermineRoutePOST(String email, String mode, String aLon,String aLat,String bLon,String bLat) {
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        String url = getResources().getString(R.string.server_ip) + "account";
+        String url = getResources().getString(R.string.server_ip) + "determineRoute";
 
         try {
             JSONObject jsonBody = new JSONObject();
@@ -166,13 +227,15 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
+                    Log.d("test","response success");
                     openMenu();
-                    showRoute();
+                    showRoute(response);
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     // put the error here
+                    Log.d("error",error.toString());
                 }
             });
             // Add the request to the RequestQueue.
@@ -180,13 +243,78 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
 
         } catch (
                 JSONException e) {
+            Log.d("exception","wrong");
             e.printStackTrace();
         }
     }
 
-    private void showRoute()
+    private void showRoute(JSONObject obj)
     {
-        //todo
+        try {
+
+            String result = (String) obj.get("result");
+
+            if (!result.equals("True"))
+            {
+                Toast.makeText(this, "Couldn't determine route. Try again later.",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            JSONObject overview_polylineJson = obj.getJSONObject("overview_polyline");
+            List<LatLng> points = decodePolyLine(overview_polylineJson.getString("points"));
+            route = new PolylineOptions().
+                    geodesic(true).
+                    color(Color.BLUE).
+                    width(10);
+            for (int i = 0; i < points.size(); i++)
+                route.add(points.get(i));
+            line = gMap.addPolyline(route);
+        } catch(JSONException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private List<LatLng> decodePolyLine(String routePoints) {
+
+        //Log.d("DECOOOOOOOODE", routePoints);
+        int len = routePoints.length();
+        int index = 0;
+        List<LatLng> decoded = new ArrayList<LatLng>();
+        int lat = 0;
+        int lng = 0;
+
+        while (index < len) {
+            int b;
+            int shift = 0;
+            int result = 0;
+            do {
+                b = routePoints.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+
+            shift = 0;
+            result = 0;
+            do {
+                b = routePoints.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+
+            LatLng point = new LatLng(
+                    lat / 100000d, lng / 100000d
+            );
+            //Log.d("POOOOOINT", point.latitude+" "+point.longitude);
+            decoded.add(point);
+        }
+
+        return decoded;
     }
 
     private void openMenu()
@@ -196,7 +324,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
 
     public void sendUpdateWalkPOST(String email, String lon, String lat, String onRoute) {
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        String url = getResources().getString(R.string.server_ip) + "account";
+        String url = getResources().getString(R.string.server_ip) + "walkUpdate";
 
         try {
             JSONObject jsonBody = new JSONObject();

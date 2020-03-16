@@ -307,8 +307,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         // Output format
         String output = "json";
         // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + "AIzaSyBduaZIXEGGMPnEXcYQERJS5pFOvCG0i20";
-        //TODO Why is the key written here in plaintext?
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + "key";
         return url;
     }
 
