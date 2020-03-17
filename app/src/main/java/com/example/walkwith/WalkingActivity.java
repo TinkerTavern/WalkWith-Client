@@ -51,7 +51,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
     SearchView searchView;
     Button alarmButton, startWalk, finishWalk, back;
     SupportMapFragment mapFragment;
-    boolean active,onRoute;
+    boolean active,onRoute, gotLocation;
     LatLng currentLocation, destination;
     String email,mode;
     Polyline line;
@@ -136,6 +136,10 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
 
                 //TODO make this a thread
                 getUserLocation();
+                while(!gotLocation) {
+
+                }
+                gotLocation = false;
                 Log.d("test","start");
                 back.setVisibility(View.VISIBLE);
                 startWalk.setVisibility(View.VISIBLE);
@@ -362,6 +366,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             if (location != null) {
                 double lat = location.getLatitude(), lon = location.getLongitude();
                 currentLocation = new LatLng(lat,lon);
+                gotLocation = true;
             } else {
                 // Gone wrong
                 Toast.makeText(this, "Error in getting location",
