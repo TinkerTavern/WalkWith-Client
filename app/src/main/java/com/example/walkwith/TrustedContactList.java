@@ -1,5 +1,6 @@
 package com.example.walkwith;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -8,15 +9,19 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import java.util.ArrayList;
+
 
 public class TrustedContactList extends AppCompatActivity implements MyRecyclerViewAdapter.ItemClickListener{
     MyRecyclerViewAdapter adapter;
     ArrayList<String> trustedContactNames = new ArrayList<>();
     int nameIndex;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +31,7 @@ public class TrustedContactList extends AppCompatActivity implements MyRecyclerV
         Button addTC = findViewById(R.id.addTCButton);
 
         addTC.setOnClickListener(new View.OnClickListener(){
+
             @Override
             public void onClick(View view) {
                 onButtonClick(view);
@@ -70,11 +76,37 @@ public class TrustedContactList extends AppCompatActivity implements MyRecyclerV
     }
 
     public void onButtonClick(View view){
-        insertSingleItem();
+        final AlertDialog.Builder alert = new AlertDialog.Builder(TrustedContactList.this);
+        final View v = getLayoutInflater().inflate(R.layout.contact_dialog_layout, null);
+
+
+        EditText edit_FirstName =  v.findViewById(R.id.edit_FirstName);
+        EditText edit_Surname =  v.findViewById(R.id.edit_Surname);
+        EditText edit_Email =  v.findViewById(R.id.edit_email);
+        Button button_submit = v.findViewById(R.id.button_submit);
+
+        alert.setView(v);
+
+
+        final AlertDialog alertDialog = alert.create();
+
+
+
+        button_submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String FirstName = edit_FirstName.getText().toString();
+                String Surname = edit_Surname.getText().toString();
+                String Email = edit_Email.getText().toString();
+                insertSingleItem(FirstName);
+                alertDialog.dismiss();
+            }
+        });
+        alert.show();
     }
 
-    private void insertSingleItem(){
-        String item = "Glasses";
+    private void insertSingleItem(String name){
+        String item = name;
         int insertIndex = 0;
         trustedContactNames.add(insertIndex, item);
         adapter.notifyItemInserted(insertIndex);
@@ -101,7 +133,7 @@ public class TrustedContactList extends AppCompatActivity implements MyRecyclerV
     }
 
     protected void openList(){
-        Intent openList = new Intent(this, TrustedContactList.class);
+        Intent openList = new Intent(this, TrustedContacts.class);
         startActivity(openList);
     }
 }
