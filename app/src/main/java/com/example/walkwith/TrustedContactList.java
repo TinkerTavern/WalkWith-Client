@@ -76,33 +76,33 @@ public class TrustedContactList extends AppCompatActivity implements MyRecyclerV
     }
 
     public void onButtonClick(View view){
-        final AlertDialog.Builder alert = new AlertDialog.Builder(TrustedContactList.this);
-        final View v = getLayoutInflater().inflate(R.layout.contact_dialog_layout, null);
-
-
-        EditText edit_FirstName =  v.findViewById(R.id.edit_FirstName);
-        EditText edit_Surname =  v.findViewById(R.id.edit_Surname);
-        EditText edit_Email =  v.findViewById(R.id.edit_email);
-        Button button_submit = v.findViewById(R.id.button_submit);
-
-        alert.setView(v);
-
-
-        final AlertDialog alertDialog = alert.create();
-
-
-
-        button_submit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String FirstName = edit_FirstName.getText().toString();
-                String Surname = edit_Surname.getText().toString();
-                String Email = edit_Email.getText().toString();
-                insertSingleItem(FirstName);
-                alertDialog.dismiss();
-            }
-        });
-        alert.show();
+//        final AlertDialog.Builder alert = new AlertDialog.Builder(TrustedContactList.this);
+//        final View v = getLayoutInflater().inflate(R.layout.contact_dialog_layout, null);
+//
+//
+//        EditText edit_FirstName =  v.findViewById(R.id.edit_FirstName);
+//        EditText edit_Surname =  v.findViewById(R.id.edit_Surname);
+//        EditText edit_Email =  v.findViewById(R.id.edit_email);
+//        Button button_submit = v.findViewById(R.id.button_submit);
+//
+//        alert.setView(v);
+//
+//
+//        final AlertDialog alertDialog = alert.create();
+//
+//
+//
+//        button_submit.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                String FirstName = edit_FirstName.getText().toString();
+//                String Surname = edit_Surname.getText().toString();
+//                String Email = edit_Email.getText().toString();
+//                insertSingleItem(FirstName);
+//                alertDialog.dismiss();
+//            }
+//        });
+//        alert.show();
     }
 
     private void insertSingleItem(String name){
