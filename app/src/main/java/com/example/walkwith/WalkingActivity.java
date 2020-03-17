@@ -1,11 +1,17 @@
 package com.example.walkwith;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -41,6 +47,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -51,11 +58,13 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
     SearchView searchView;
     Button alarmButton, startWalk, finishWalk, back;
     SupportMapFragment mapFragment;
-    boolean active,onRoute, gotLocation;
+    boolean active, onRoute, gotLocation;
     LatLng currentLocation, destination;
-    String email,mode;
+    String email, mode;
     Polyline line;
     PolylineOptions route;
+    private Location currentBestLocation = null;
+    private LocationManager mLocationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +72,12 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         setContentView(R.layout.activity_walking);
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapView2);
-        mapFragment.getMapAsync(this);
+        try {
+            Objects.requireNonNull(mapFragment).getMapAsync(this);
+        } catch (NullPointerException e) {
+            Toast.makeText(this, "Maps Error.", Toast.LENGTH_SHORT).show();
+        }
+        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         email = AccountInfo.getEmail();
         active = false;
         onRoute = false;
@@ -107,9 +121,9 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                     @Override
                     public void run() {
                         if (active) {
-                            getUserLocation();
+                            getLastBestLocation();
                             //todo check if on route
-                            sendUpdateWalkPOST(email,Double.toString(currentLocation.latitude),Double.toString(currentLocation.longitude), Boolean.toString(onRoute));
+                            sendUpdateWalkPOST(email, Double.toString(currentLocation.latitude), Double.toString(currentLocation.longitude), Boolean.toString(onRoute));
                         }
 
                     }
@@ -135,19 +149,16 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             public boolean onQueryTextSubmit(String query) {
 
                 //TODO make this a thread
-                getUserLocation();
-                while(!gotLocation) {
-
-                }
+                getLastBestLocation();
                 gotLocation = false;
-                Log.d("test","start");
+                Log.d("test", "start");
                 back.setVisibility(View.VISIBLE);
                 startWalk.setVisibility(View.VISIBLE);
                 String location = searchView.getQuery().toString();
                 List<Address> list = null;
-                Log.d("test1","before");
+                Log.d("test1", "before");
                 Geocoder geocoder = new Geocoder(WalkingActivity.this);
-                Log.d("test2","after");
+                Log.d("test2", "after");
 
                 try {
                     list = geocoder.getFromLocationName(location, 1);
@@ -155,15 +166,15 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                     e.printStackTrace();
                 }
 
-                if (list!=null&&!list.isEmpty()) {
+                if (list != null && !list.isEmpty()) {
                     Address address = list.get(0);
-                    destination = new LatLng(address.getLatitude(),address.getLongitude());
+                    Log.d("test", address.getAddressLine(0));
+                    destination = new LatLng(address.getLatitude(), address.getLongitude());
                     Marker marker = gMap.addMarker(new MarkerOptions().position(destination).title(location));
-                    gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destination,10));
-                    sendDetermineRoutePOST(email,mode,Double.toString(currentLocation.latitude),Double.toString(currentLocation.longitude), location);
-                }
-                else {
-                    Log.d("test","failed attempt");
+                    gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destination, 10));
+                    sendDetermineRoutePOST(email, mode, Double.toString(currentLocation.latitude), Double.toString(currentLocation.longitude), Double.toString(destination.latitude), Double.toString(destination.longitude));
+                } else {
+                    Log.d("test", "failed attempt");
                 }
 
                 return true;
@@ -179,7 +190,8 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         back.setVisibility(View.GONE);
         startWalk.setVisibility(View.GONE);
     }
-    protected void openAlarm(){
+
+    protected void openAlarm() {
         Intent viewAlarm = new Intent(this, AlarmActivity.class);
         startActivity(viewAlarm);
     }
@@ -214,7 +226,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         }*/
     }
 
-    public void sendDetermineRoutePOST(String email, String mode, String aLon,String aLat,String destination) {
+    public void sendDetermineRoutePOST(String email, String mode, String aLat, String aLon, String bLat, String bLong) {
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String url = getResources().getString(R.string.server_ip) + "determineRoute";
 
@@ -222,16 +234,18 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             JSONObject jsonBody = new JSONObject();
 
             jsonBody.put("email", email);
-            jsonBody.put("mode", mode);
+            jsonBody.put("mode", "die");
             jsonBody.put("aLong", aLon);
             jsonBody.put("aLat", aLat);
-            jsonBody.put("dest", destination);
+            jsonBody.put("bLong", bLong);
+            jsonBody.put("bLat", bLat);
             // Put your headers here
+            Log.d("test", aLat+", "+aLon+", "+bLat+", "+bLong);
 
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    Log.d("test","response success");
+                    Log.d("test", "response success");
                     openMenu();
                     showRoute(response);
                 }
@@ -239,7 +253,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     // put the error here
-                    Log.d("error",error.toString());
+                    Log.d("error", error.toString());
                 }
             });
             // Add the request to the RequestQueue.
@@ -247,19 +261,18 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
 
         } catch (
                 JSONException e) {
-            Log.d("exception","wrong");
+            Log.d("exception", "wrong");
             e.printStackTrace();
         }
     }
 
-    private void showRoute(JSONObject obj)
-    {
+    private void showRoute(JSONObject obj) {
         try {
 
             String result = (String) obj.get("result");
+            Log.d("test", result);
 
-            if (!result.equals("True"))
-            {
+            if (!result.equals("True")) {
                 Toast.makeText(this, "Couldn't determine route. Try again later.",
                         Toast.LENGTH_SHORT).show();
                 return;
@@ -274,8 +287,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             for (int i = 0; i < points.size(); i++)
                 route.add(points.get(i));
             line = gMap.addPolyline(route);
-        } catch(JSONException e)
-        {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
@@ -321,8 +333,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         return decoded;
     }
 
-    private void openMenu()
-    {
+    private void openMenu() {
 
     }
 
@@ -359,19 +370,34 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         }
     }
 
-    private void getUserLocation() {
-        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplicationContext());
+    private void getLastBestLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Location locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location locationNet = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
-        fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
-            if (location != null) {
-                double lat = location.getLatitude(), lon = location.getLongitude();
-                currentLocation = new LatLng(lat,lon);
-                gotLocation = true;
-            } else {
-                // Gone wrong
-                Toast.makeText(this, "Error in getting location",
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
+        long GPSLocationTime = 0;
+        if (null != locationGPS) { GPSLocationTime = locationGPS.getTime(); }
+
+        long NetLocationTime = 0;
+
+        if (null != locationNet) {
+            NetLocationTime = locationNet.getTime();
+        }
+
+        if ( 0 < GPSLocationTime - NetLocationTime ) {
+            currentLocation = new LatLng(locationGPS.getLatitude(), locationGPS.getLongitude());
+        }
+        else {
+            currentLocation = new LatLng(locationNet.getLatitude(), locationNet.getLongitude());
+        }
     }
 }
