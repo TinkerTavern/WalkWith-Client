@@ -331,8 +331,8 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
                 public void onResponse(JSONObject response) {
                     try {
 
-                        Double[] Longs = Utilities.jsonArrayToList((JSONArray) response.get("longs")).toArray(new Double[0]);
-                        Double[] Lats = Utilities.jsonArrayToList((JSONArray) response.get("lats")).toArray(new Double[0]);
+                        String[] Longs = Utilities.jsonArrayToList((JSONArray) response.get("longs")).toArray(new String[0]);
+                        String[] Lats = Utilities.jsonArrayToList((JSONArray) response.get("lats")).toArray(new String[0]);
                         String[] emails = Utilities.jsonArrayToList((JSONArray) response.get("emails")).toArray(new String[0]);
                         displayTrustedContactLoc(emails, Lats, Longs);
                     } catch (JSONException e) {
@@ -353,12 +353,12 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         }
     }
 
-    private void displayTrustedContactLoc(String[] emails, Double[] lats, Double[] longs){
+    private void displayTrustedContactLoc(String[] emails, String[] lats, String[] longs){
         Marker mFriend;
 
         for(int i = 0; i < emails.length; i++){
             mFriend = mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(lats[i], longs[i]))
+                    .position(new LatLng(Double.parseDouble(lats[i]),  Double.parseDouble(longs[i])))
                     .title(emails[i])
             );
             mFriend.setTag(0);
