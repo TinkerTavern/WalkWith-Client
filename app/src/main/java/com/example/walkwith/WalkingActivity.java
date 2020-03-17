@@ -135,6 +135,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             public boolean onQueryTextSubmit(String query) {
 
                 //TODO make this a thread
+                getUserLocation();
                 Log.d("test","start");
                 back.setVisibility(View.VISIBLE);
                 startWalk.setVisibility(View.VISIBLE);
@@ -155,7 +156,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                     destination = new LatLng(address.getLatitude(),address.getLongitude());
                     Marker marker = gMap.addMarker(new MarkerOptions().position(destination).title(location));
                     gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destination,10));
-                    sendDetermineRoutePOST(email,mode,Double.toString(currentLocation.latitude),Double.toString(currentLocation.longitude),Double.toString(destination.latitude),Double.toString(destination.longitude));
+                    sendDetermineRoutePOST(email,mode,Double.toString(currentLocation.latitude),Double.toString(currentLocation.longitude), location);
                 }
                 else {
                     Log.d("test","failed attempt");
@@ -209,7 +210,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         }*/
     }
 
-    public void sendDetermineRoutePOST(String email, String mode, String aLon,String aLat,String bLon,String bLat) {
+    public void sendDetermineRoutePOST(String email, String mode, String aLon,String aLat,String destination) {
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String url = getResources().getString(R.string.server_ip) + "determineRoute";
 
@@ -220,8 +221,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             jsonBody.put("mode", mode);
             jsonBody.put("aLong", aLon);
             jsonBody.put("aLat", aLat);
-            jsonBody.put("bLong", bLon);
-            jsonBody.put("bLat", bLat);
+            jsonBody.put("dest", destination);
             // Put your headers here
 
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
