@@ -177,15 +177,6 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
                     MY_LOCATION_REQUEST_CODE);
         }
 
-        //Adding friends to map
-
-        //TODO UNCOMMENT THIS TO USE ACTUAL FRIEND'S AND USER DETAILS
-        Toast.makeText(this, "Hello, " + AccountInfo.getEmail(),
-                Toast.LENGTH_SHORT).show();
-
-        //This is for testing use line up top
-        //displayTrustedContactLoc(new String[]{"a", "b", "c"}, new Double[]{52.0, 32.0, 52.0}, new Double[]{2.1, 3.2, 4.3});
-
         mMap.setOnMarkerClickListener(this);
 
         String url = getUrl(place1.getPosition(), place2.getPosition(), "walking");
@@ -306,10 +297,11 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        AccountInfo.setFriendFocusedOn(marker.getTitle());
-        Intent focusView = new Intent (this, FocusView.class);
-        startActivity(focusView);
-        return false;
+        if(Objects.equals(marker.getTag(), 1))
+            AccountInfo.setFriendFocusedOn(marker.getTitle());
+            Intent focusView = new Intent (this, FocusView.class);
+            startActivity(focusView);
+            return false;
     }
 
     private String getUrl(LatLng origin, LatLng dest, String directionMode) {
@@ -393,7 +385,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
                     .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.profile_icon02, "" + emails[i])))
                     .anchor(0.5f,1)
             );
-            mFriend.setTag(i);
+            mFriend.setTag(1);
         }
     }
 
