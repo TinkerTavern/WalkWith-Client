@@ -3,8 +3,11 @@ package com.example.walkwith;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -26,6 +29,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener, OnMapReadyCallback {
@@ -67,11 +71,6 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
-
-        //This is for testing use line up top
-        //displayFocusedLoc(new String[]{accountInfo.getFriendFocusedOn()}, new int[]{52}, new double[]{2.1});
-        displayFocusedLoc(new String[]{"a", "b", "c"}, new int[]{52, 32, 76}, new double[]{2.1, 3.2, 4.3});
-        //moveToCurrentLocation(52,2.1);
     }
 
     private void updateViewPOST(String email) { // TODO Make this a general function
@@ -87,10 +86,12 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
                 public void onResponse(JSONObject response) {
                     try {
 
-                        Double[] Longs = Utilities.jsonArrayToList((JSONArray) response.get("longs")).toArray(new Double[0]);
-                        Double[] Lats = Utilities.jsonArrayToList((JSONArray) response.get("lats")).toArray(new Double[0]);
+                        String[] Longs = Utilities.jsonArrayToList((JSONArray) response.get("longs")).toArray(new String[0]);
+                        String[] Lats = Utilities.jsonArrayToList((JSONArray) response.get("lats")).toArray(new String[0]);
                         String[] emails = Utilities.jsonArrayToList((JSONArray) response.get("emails")).toArray(new String[0]);
-                        displayTrustedContactLoc(emails, Lats, Longs); // TODO: Also get the route they are going on
+                        ArrayList<Double> longsList = convertToDouble(Longs);
+                        ArrayList<Double> latsList = convertToDouble(Lats);
+                        displayTrustedContactLoc(emails, latsList, longsList); // TODO: Also get the route they are going on
                     } catch (JSONException e) {
                         e.getMessage();
                     }
@@ -109,22 +110,15 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         }
     }
 
-    private void displayFocusedLoc(String[] emails, int[] lats, double[] longs) {
-        Marker mFriend;
-        //int focusedOnIndex = 0;
-        for(int i = 0; i < emails.length; i++){
-//            if(AccountInfo.getFriendFocusedOn().equals(emails[i]))
-//                focusedOnIndex = i;
-            mFriend = mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(lats[i], longs[i]))
-                    .title(emails[i])
-            );
-            mFriend.setTag(0);
-            moveToCurrentLocation(lats[i], longs[i]);
+    private ArrayList<Double> convertToDouble(String[] array) {
+        ArrayList<Double> doubleList = new ArrayList<>();
+        for(String numbers:array){
+            doubleList.add(Double.valueOf(numbers));
         }
+        return doubleList;
     }
 
-    private void moveToCurrentLocation(int lats, double longs )
+    private void moveToCurrentLocation(double lats, double longs )
     {
         LatLng currentLocation =  new LatLng(lats, longs);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation,15));
@@ -154,12 +148,14 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
 
     }
 
-    private void displayTrustedContactLoc(String[] emails, Double[] lats, Double[] longs){
+    private void displayTrustedContactLoc(
+            String[] emails, ArrayList<Double> lats, ArrayList<Double> longs){
         Marker mFriend;
 
         for(int i = 0; i < emails.length; i++){
+            Log.e("mytag","" + i + ": " + emails[i] + "," + lats.get(i) + "," + longs.get(i));
             mFriend = mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(lats[i], longs[i]))
+                    .position(new LatLng(lats.get(i), longs.get(i)))
                     .title(emails[i])
             );
             mFriend.setTag(0);

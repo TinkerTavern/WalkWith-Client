@@ -1,5 +1,6 @@
 package com.example.walkwith;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -11,13 +12,26 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorSpace;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -28,9 +42,11 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import com.example.walkwith.utils.Utilities;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -42,6 +58,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class MainMenu extends FragmentActivity implements View.OnClickListener, GoogleMap.OnMyLocationButtonClickListener,
@@ -64,7 +81,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-//        mapFragment.getMapAsync(this);
+        mapFragment.getMapAsync(this);
 
         try {
             Objects.requireNonNull(mapFragment).getMapAsync(this);
@@ -167,7 +184,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
                 Toast.LENGTH_SHORT).show();
 
         //This is for testing use line up top
-        //displayTrustedContactLoc(new String[]{"a", "b", "c"}, new int[]{52, 32, 76}, new double[]{2.1, 3.2, 4.3});
+        //displayTrustedContactLoc(new String[]{"a", "b", "c"}, new Double[]{52.0, 32.0, 52.0}, new Double[]{2.1, 3.2, 4.3});
 
         mMap.setOnMarkerClickListener(this);
 
@@ -307,7 +324,8 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         // Output format
         String output = "json";
         // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + "key";
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + "AIzaSyBduaZIXEGGMPnEXcYQERJS5pFOvCG0i20";
+        //TODO Why is the key written here in plaintext?
         return url;
     }
 
@@ -334,7 +352,10 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
                         String[] Longs = Utilities.jsonArrayToList((JSONArray) response.get("longs")).toArray(new String[0]);
                         String[] Lats = Utilities.jsonArrayToList((JSONArray) response.get("lats")).toArray(new String[0]);
                         String[] emails = Utilities.jsonArrayToList((JSONArray) response.get("emails")).toArray(new String[0]);
-                        displayTrustedContactLoc(emails, Lats, Longs);
+                        ArrayList<Double> longsList = convertToDouble(Longs);
+                        ArrayList<Double> latsList = convertToDouble(Lats);
+                        displayTrustedContactLoc(emails, latsList, longsList);
+
                     } catch (JSONException e) {
                         e.getMessage();
                     }
@@ -353,15 +374,50 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         }
     }
 
-    private void displayTrustedContactLoc(String[] emails, String[] lats, String[] longs){
+    private ArrayList<Double> convertToDouble(String[] array) {
+        ArrayList<Double> doubleList = new ArrayList<>();
+        for(String numbers:array){
+            doubleList.add(Double.valueOf(numbers));
+        }
+        return doubleList;
+    }
+
+    private void displayTrustedContactLoc(
+            String[] emails, ArrayList<Double> lats, ArrayList<Double> longs){
         Marker mFriend;
 
         for(int i = 0; i < emails.length; i++){
+            Log.e("mytag","" + i + ": " + emails[i] + "," + lats.get(i) + "," + longs.get(i));
             mFriend = mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(Double.parseDouble(lats[i]),  Double.parseDouble(longs[i])))
-                    .title(emails[i])
+                    .position(new LatLng(lats.get(i), longs.get(i)))
+                    .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.profile_icon02, "" + emails[i])))
+                    .anchor(0.5f,1)
             );
-            mFriend.setTag(0);
+            mFriend.setTag(i);
         }
+    }
+
+    private Bitmap getMarkerBitmapFromView(@DrawableRes int resId, String username) {
+
+        View customMarkerView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.profile_icon_view, null);
+        ImageView markerImageView = (ImageView) customMarkerView.findViewById(R.id.profile_image);
+        markerImageView.setImageResource(resId);
+        customMarkerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        customMarkerView.layout(0, 0, customMarkerView.getMeasuredWidth(), customMarkerView.getMeasuredHeight());
+        customMarkerView.buildDrawingCache();
+
+        TextView customTextView = (TextView) customMarkerView.findViewById(R.id.text_view);
+        customTextView.setText(username);
+
+        Bitmap returnedBitmap = Bitmap.createBitmap(customMarkerView.getMeasuredWidth(), customMarkerView.getMeasuredHeight(),
+                Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(returnedBitmap);
+        canvas.drawColor(Color.WHITE, PorterDuff.Mode.SRC_IN);
+
+        Drawable drawable = customMarkerView.getBackground();
+        if (drawable != null)
+            drawable.draw(canvas);
+        customMarkerView.draw(canvas);
+        return returnedBitmap;
     }
 }
