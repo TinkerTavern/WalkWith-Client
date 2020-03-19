@@ -391,6 +391,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
             mFriend = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(lats.get(i), longs.get(i)))
                     .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.profile_icon02, "" + emails[i])))
+                    .title(emails[i])
                     .anchor(0.5f,1)
             );
             mFriend.setTag(1);

@@ -161,6 +161,9 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
                     .anchor(0.5f,1)
             );
             mFriend.setTag(i);
+            if (emails[i].equals(AccountInfo.getFriendFocusedOn())) {
+                moveToCurrentLocation(lats.get(i), longs.get(i));
+            }
         }
     }
 
