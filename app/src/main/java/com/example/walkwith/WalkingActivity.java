@@ -54,17 +54,18 @@ import java.util.concurrent.TimeUnit;
 
 public class WalkingActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    GoogleMap gMap;
-    SearchView searchView;
-    Button alarmButton, startWalk, finishWalk, back;
-    SupportMapFragment mapFragment;
-    boolean active, onRoute, gotLocation;
-    LatLng currentLocation, destination;
-    String email, mode;
-    Polyline line;
-    PolylineOptions route;
+    private GoogleMap gMap;
+    private SearchView searchView;
+    private Button alarmButton, startWalk, finishWalk, back;
+    private SupportMapFragment mapFragment;
+    private boolean active, onRoute, gotLocation;
+    private LatLng currentLocation, destination;
+    private String email, mode;
+    private Polyline line;
+    private PolylineOptions route;
     private Location currentBestLocation = null;
     private LocationManager mLocationManager;
+    private List<LatLng> points;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,8 +123,9 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                     public void run() {
                         if (active) {
                             getLastBestLocation();
-                            //todo check if on route
+                            onRoute = checkIfOnRoute(100);
                             sendUpdateWalkPOST(email, Double.toString(currentLocation.latitude), Double.toString(currentLocation.longitude), Boolean.toString(onRoute));
+                            onRoute = true;
                         }
 
                     }
@@ -150,15 +152,9 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
 
                 //TODO make this a thread
                 getLastBestLocation();
-                gotLocation = false;
-                Log.d("test", "start");
-                back.setVisibility(View.VISIBLE);
-                startWalk.setVisibility(View.VISIBLE);
                 String location = searchView.getQuery().toString();
                 List<Address> list = null;
-                Log.d("test1", "before");
                 Geocoder geocoder = new Geocoder(WalkingActivity.this);
-                Log.d("test2", "after");
 
                 try {
                     list = geocoder.getFromLocationName(location, 1);
@@ -167,6 +163,9 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                 }
 
                 if (list != null && !list.isEmpty()) {
+                    back.setVisibility(View.VISIBLE);
+                    startWalk.setVisibility(View.VISIBLE);
+
                     Address address = list.get(0);
                     Log.d("test", address.getAddressLine(0));
                     destination = new LatLng(address.getLatitude(), address.getLongitude());
@@ -199,6 +198,8 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
     @Override
     public void onMapReady(GoogleMap googleMap) {
         gMap = googleMap;
+
+
         //hardcoded test for the show route method
         /*getUserLocation();
         line = gMap.addPolyline(route);
@@ -279,7 +280,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             }
 
             JSONObject overview_polylineJson = obj.getJSONObject("overview_polyline");
-            List<LatLng> points = decodePolyLine(overview_polylineJson.getString("points"));
+            points = decodePolyLine(overview_polylineJson.getString("points"));
             route = new PolylineOptions().
                     geodesic(true).
                     color(Color.BLUE).
@@ -290,6 +291,16 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean checkIfOnRoute(double maxDistanceAway) {
+        for(int i = 0;i<points.size();i++){
+            double dist = distance(points.get(i).latitude,points.get(i).longitude,currentLocation.latitude,currentLocation.longitude);
+            if(dist<maxDistanceAway){
+                return true;
+            }
+        }
+        return false;
     }
 
     private List<LatLng> decodePolyLine(String routePoints) {
@@ -331,6 +342,22 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         }
 
         return decoded;
+    }
+
+    public double distance (double lat_a, double lng_a, double lat_b, double lng_b )
+    {
+        double earthRadius = 3958.75;
+        double latDiff = Math.toRadians(lat_b-lat_a);
+        double lngDiff = Math.toRadians(lng_b-lng_a);
+        double a = Math.sin(latDiff /2) * Math.sin(latDiff /2) +
+                Math.cos(Math.toRadians(lat_a)) * Math.cos(Math.toRadians(lat_b)) *
+                        Math.sin(lngDiff /2) * Math.sin(lngDiff /2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double distance = earthRadius * c;
+
+        int meterConversion = 1609;
+
+        return new Double(distance * meterConversion).doubleValue();
     }
 
     private void openMenu() {
