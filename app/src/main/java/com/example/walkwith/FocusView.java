@@ -58,7 +58,7 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         SupportMapFragment mapFragment =
-                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView2);
         try {
             Objects.requireNonNull(mapFragment).getMapAsync(this);
         }
@@ -168,6 +168,9 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
                     .anchor(0.5f,1)
             );
             mFriend.setTag(i);
+            if (emails[i].equals(AccountInfo.getFriendFocusedOn())) {
+                moveToCurrentLocation(lats.get(i), longs.get(i));
+            }
         }
     }
 
