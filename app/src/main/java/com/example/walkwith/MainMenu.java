@@ -83,6 +83,20 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        trustThread = new  Thread() {
+            public void run() {
+                // do stuff
+                while (true) {
+                    updateViewPOST(AccountInfo.getEmail());
+                    try {
+                        Thread.sleep(Integer.parseInt(getResources().getString(R.string.idleTimer)));
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
+            }
+        };
+
         try {
             Objects.requireNonNull(mapFragment).getMapAsync(this);
         } catch (NullPointerException e) {
@@ -98,20 +112,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         viewActiveWalkers.setOnClickListener(this);
         startNewWalk.setOnClickListener(this);
 
-        trustThread = new  Thread() {
-            public void run() {
-                // do stuff
-                while (true) {
-                    updateViewPOST(AccountInfo.getEmail());
-                    try {
-                        Thread.sleep(Integer.parseInt(getResources().getString(R.string.idleTimer)));
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-                }
-            }
-        };
-        trustThread.start();
+
 
         place1 = new MarkerOptions().position(new LatLng(27.658143, 85.3199503)).title("Location 1");
         place2 = new MarkerOptions().position(new LatLng(27.667491, 85.3208583)).title("Location 2");
@@ -155,6 +156,12 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         startActivity(openWalking);
     }
 
+    private void startThread() {
+        if (!trustThread.isAlive())
+            trustThread.start();
+
+    }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -167,6 +174,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        startThread();
         // Get users last location to show on map
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED)
