@@ -34,16 +34,22 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener, OnMapReadyCallback {
     private GoogleMap mMap;
+    private Polyline line;
+    private PolylineOptions route;
+    private LatLng friendLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +87,7 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
+        sendGetFriendRoutePOST(AccountInfo.getEmail(),AccountInfo.getFriendFocusedOn());
     }
 
     private void updateViewPOST(String email) { // TODO Make this a general function
@@ -197,5 +204,92 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         // Zoom out to zoom level 10, animating with a duration of 2 seconds.
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
 
+    }
+
+    public void sendGetFriendRoutePOST(String email,String friendEmail) {
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        String url = getResources().getString(R.string.server_ip) + "getFriendRoute";
+
+        try {
+            JSONObject jsonBody = new JSONObject();
+
+            jsonBody.put("email", email);
+            jsonBody.put("friendEmail", friendEmail);
+            // Put your headers here
+
+            JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    showRoute(response);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // put the error here
+                }
+            });
+            // Add the request to the RequestQueue.
+            queue.add(jsonObject);
+
+        } catch (
+                JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showRoute(JSONObject response){
+        try {
+            String encodedRoute = (String) response.get("route");
+
+            List<LatLng> points = decodePolyLine(encodedRoute);
+            route = new PolylineOptions().
+                    geodesic(true).
+                    color(Color.BLUE).
+                    width(10);
+            for (int i = 0; i < points.size(); i++)
+                route.add(points.get(i));
+            line = mMap.addPolyline(route);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private List<LatLng> decodePolyLine(String routePoints) {
+        int len = routePoints.length();
+        int index = 0;
+        List<LatLng> decoded = new ArrayList<LatLng>();
+        int lat = 0;
+        int lng = 0;
+
+        while (index < len) {
+            int b;
+            int shift = 0;
+            int result = 0;
+            do {
+                b = routePoints.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+
+            shift = 0;
+            result = 0;
+            do {
+                b = routePoints.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+
+            LatLng point = new LatLng(
+                    lat / 100000d, lng / 100000d
+            );
+            decoded.add(point);
+        }
+
+        return decoded;
     }
 }

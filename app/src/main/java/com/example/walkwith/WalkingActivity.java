@@ -100,7 +100,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onClick(View v) {
                 destination = null;
-                line.setVisible(false);
+                line.remove();
                 back.setVisibility(View.GONE);
                 startWalk.setVisibility(View.GONE);
             }
@@ -140,7 +140,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                 active = false;
                 finishWalk.setVisibility(View.GONE);
                 searchView.setVisibility(View.VISIBLE);
-                line.setVisible(false);
+                line.remove();
             }
         });
 
@@ -247,7 +247,6 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                 @Override
                 public void onResponse(JSONObject response) {
                     Log.d("test", "response success");
-                    openMenu();
                     showRoute(response);
                 }
             }, new Response.ErrorListener() {
@@ -358,10 +357,6 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         int meterConversion = 1609;
 
         return new Double(distance * meterConversion).doubleValue();
-    }
-
-    private void openMenu() {
-
     }
 
     public void sendUpdateWalkPOST(String email, String lon, String lat, String onRoute) {
