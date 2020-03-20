@@ -124,7 +124,9 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                         if (active) {
                             getLastBestLocation();
                             onRoute = checkIfOnRoute(100);
-                            sendUpdateWalkPOST(email, Double.toString(currentLocation.latitude), Double.toString(currentLocation.longitude), Boolean.toString(onRoute));
+                            sendUpdateWalkPOST(email, Double.toString(currentLocation.latitude),
+                                    Double.toString(currentLocation.longitude),
+                                    Boolean.toString(onRoute), "1");
                             onRoute = true;
                         }
 
@@ -141,6 +143,9 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                 finishWalk.setVisibility(View.GONE);
                 searchView.setVisibility(View.VISIBLE);
                 line.remove();
+                sendUpdateWalkPOST(email, Double.toString(currentLocation.latitude),
+                        Double.toString(currentLocation.longitude),
+                        Boolean.toString(onRoute), "0");
             }
         });
 
@@ -359,7 +364,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         return new Double(distance * meterConversion).doubleValue();
     }
 
-    public void sendUpdateWalkPOST(String email, String lon, String lat, String onRoute) {
+    public void sendUpdateWalkPOST(String email, String lon, String lat, String onRoute, String isActive) {
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String url = getResources().getString(R.string.server_ip) + "walkUpdate";
 
@@ -370,6 +375,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             jsonBody.put("long", lon);
             jsonBody.put("lat", lat);
             jsonBody.put("onRoute", onRoute);
+            jsonBody.put("isActive", isActive);
             // Put your headers here
 
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
