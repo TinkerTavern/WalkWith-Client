@@ -16,7 +16,11 @@
     <string name="activeTimer">10000</string>
     <string name="idleTimer">30000</string>
     <string name="rememberMe">Stay Logged In </string>
-
+    <string name="unknown">Unknown</string>
+    <string name="forename">Forename</string>
+    <string name="surname">Surname</string>
+    <string name="email">Email Address</string>
+    <string name="phone">Phone Number</string>
     <!-- Preference Titles -->
 
     <!-- Messages Preferences -->
