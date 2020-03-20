@@ -9,29 +9,53 @@
 
             <Button
                 android:id="@+id/button18"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="#F44336"
+                android:gravity="start"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="View Profile" />
 
             <Button
                 android:id="@+id/logOut"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="#F44336"
+                android:gravity="start"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Log Out" />
+
             <Button
                 android:id="@+id/deleteAccount"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="#F44336"
+                android:gravity="start"
+                android:theme="@style/WWSwitch"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Delete Account"/>
 
             <Switch
                 android:id="@+id/switch1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="#F44336"
+                android:gravity="start"
+                android:theme="@style/WWSwitch"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Dark Mode " />
 
             <Switch
                 android:id="@+id/switch2"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="#F44336"
+                android:gravity="start"
+                android:theme="@style/WWSwitch"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Notifications" />
