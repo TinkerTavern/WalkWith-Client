@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,17 +29,20 @@ public class AlarmActivity extends AppCompatActivity {
         setContentView(R.layout.activity_alarm);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        final Button alertContactButton = findViewById(R.id.alertContacts);
+        alertContactButton.setOnClickListener(view -> {
+            alertPOST(AccountInfo.getEmail());
+        });
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendPOST(AccountInfo.getEmail());
             }
         });
     }
 
-    private void sendPOST(String email) {
+    private void alertPOST(String email) {
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String url = getResources().getString(R.string.server_ip) + "alarm";
         try {
@@ -49,7 +54,13 @@ public class AlarmActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        response.get("result");
+                        String result = (String) response.get("result");
+                        if (result.equals("True"))
+                            result = "Successfully alarmed contacts";
+                        else
+                            result = "Error in alerting contacts";
+                        Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+
                     } catch (JSONException e) {
                         e.getMessage();
                     }
