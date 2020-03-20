@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -20,6 +22,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -69,6 +72,8 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
     private CameraManager camManager;
     private Double latitude, longitude, LATLONG_DEFAULT = 0d;
     private Float zoom, ZOOM_DEFAULT = 15f;
+    private Double endLat, endLong;
+    private TextView eta, distanceLeft;
     /*
     0 - Normal Route
     1 - Safe route
@@ -82,6 +87,9 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         setContentView(R.layout.activity_walking);
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapView2);
+
+        eta = findViewById(R.id.eta);
+        distanceLeft = findViewById(R.id.distanceLeft);
 
         zoom = getIntent().getFloatExtra("cameraZoom", ZOOM_DEFAULT);
         latitude = getIntent().getDoubleExtra("cameraLat", LATLONG_DEFAULT);
@@ -200,17 +208,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         finishWalk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                active = false;
-                finishWalk.setVisibility(View.GONE);
-                searchView.setVisibility(View.VISIBLE);
-                lightWalk.setVisibility(View.VISIBLE);
-                safeWalk.setVisibility(View.VISIBLE);
-                torch.setVisibility(View.GONE);
-                if (line != null)
-                    line.remove();
-                sendUpdateWalkPOST(email, Double.toString(currentLocation.latitude),
-                        Double.toString(currentLocation.longitude),
-                        Boolean.toString(onRoute), "0");
+                stopWalk();
             }
         });
 
@@ -302,31 +300,6 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         else
             Toast.makeText(getApplicationContext(), "Map consistency error",
                     Toast.LENGTH_SHORT).show();
-        //hardcoded test for the show route method
-        /*getUserLocation();
-        line = gMap.addPolyline(route);
-        MarkerOptions place1 = new MarkerOptions().position(new LatLng(27.658143, 85.3199503)).title("Location 1");
-        MarkerOptions place2 = new MarkerOptions().position(new LatLng(27.667491, 85.3208583)).title("Location 2");
-        gMap.addMarker(place1);
-        gMap.addMarker(place2);
-        String everything = "{\"bounds\": {\"northeast\": {\"lat\": 27.6674286, \"lng\": 85.3213586}, \"southwest\": {\"lat\": 27.6579578, \"lng\": 85.3181149}}, \"copyrights\": \"Map data \\u00a92020\", \"legs\": [{\"distance\": {\"text\": \"1.3 km\", \"value\": 1343}, \"duration\": {\"text\": \"16 mins\", \"value\":\n" +
-                "979}, \"end_address\": \"Hospital Rd, Lalitpur, Nepal\", \"end_location\": {\"lat\": 27.6673604, \"lng\": 85.3208903}, \"start_address\": \"Unnamed Road, Lalitpur 44700, Nepal\", \"start_location\": {\"lat\": 27.6581039, \"lng\": 85.31993609999999}, \"steps\": [{\"distance\":\n" +
-                "{\"text\": \"41 m\", \"value\": 41}, \"duration\": {\"text\": \"1 min\", \"value\": 28}, \"end_location\": {\"lat\": 27.6579578, \"lng\": 85.3203163}, \"html_instructions\": \"Head <b>east</b>\", \"polyline\": {\"points\": \"c~xgDs`wgO@EFYDQJY\"}, \"start_location\": {\"lat\": 27.6581039,\n" +
-                "\"lng\": 85.31993609999999}, \"travel_mode\": \"WALKING\"}, {\"distance\": {\"text\": \"0.1 km\", \"value\": 127}, \"duration\": {\"text\": \"1 min\", \"value\": 81}, \"end_location\": {\"lat\": 27.6590027, \"lng\": 85.32078349999999}, \"html_instructions\": \"Turn <b>left</b>\", \"maneuver\":\n" +
-                "\"turn-left\", \"polyline\": {\"points\": \"g}xgD_cwgO_@[k@Wq@Q]Is@K\"}, \"start_location\": {\"lat\": 27.6579578, \"lng\": 85.3203163}, \"travel_mode\": \"WALKING\"}, {\"distance\": {\"text\": \"0.4 km\", \"value\": 358}, \"duration\": {\"text\": \"4 mins\", \"value\": 260}, \"end_location\":\n" +
-                "{\"lat\": 27.6611848, \"lng\": 85.3181149}, \"html_instructions\": \"Turn left\", \"maneuver\": \"turn-left\", \"polyline\": {\"points\": \"wcygD{ewgOmB`CcBtBKLiAdB_AlAkAzA\"}, \"start_location\": {\"lat\": 27.6590027, \"lng\": 85.32078349999999}, \"travel_mode\": \"WALKING\"},\n" +
-                "{\"distance\": {\"text\": \"0.8 km\", \"value\": 768}, \"duration\": {\"text\": \"10 mins\", \"value\": 572}, \"end_location\": {\"lat\": 27.6673496, \"lng\": 85.3213586}, \"html_instructions\": \"Turn <b>right</b> onto <b>Mahalaxmisthan Rd</b>\", \"maneuver\": \"turn-right\", \"polyline\":\n" +
-                "{\"points\": \"kqygDeuvgOUIUGIIKIMKAAu@s@_@]AAuB_BoBkAKUEEKIIEa@MME]MiASo@Qe@Ii@M_Ca@QEsBi@q@QCA[MICo@WeAc@KE]O\"}, \"start_location\": {\"lat\": 27.6611848, \"lng\": 85.3181149}, \"travel_mode\": \"WALKING\"}, {\"distance\": {\"text\": \"49 m\", \"value\": 49}, \"duration\":\n" +
-                "{\"text\": \"1 min\", \"value\": 38}, \"end_location\": {\"lat\": 27.6673604, \"lng\": 85.3208903}, \"html_instructions\": \"Turn Left\", \"maneuver\": \"turn-left\", \"polyline\": {\"points\": \"}wzgDoiwgOMp@AH@B?@?B@@@@@B?@@B@@@D?@\"}, \"start_location\": {\"lat\": 27.6673496, \"lng\": 85.3213586}, \"travel_mode\": \"WALKING\"}], \"traffic_speed_entry\": [], \"via_waypoint\":\n" +
-                "[]}], \"overview_polyline\": {\"points\": \"c~xgDs`wgOH_@Pk@_@[k@WoA[s@KmB`CoBbCiAdB_AlAkAzAUI_@QYUyAuAuB_BoBkAQ[UOo@S}D}@iDo@eCo@u@Se@Q_DqAOz@@DDJDN\"}, \"summary\": \"Mahalaxmisthan Rd\", \"warnings\": [\"This route may be missing sidewalks or pedestrian paths.\"], \"waypoint_order\": [], \"result\": \"False\"}";
-        try {
-
-            JSONObject data = new JSONObject(everything);
-            showRoute(data);
-        } catch (JSONException e)
-        {
-            e.printStackTrace();
-        }*/
     }
 
     private String determineMode() {
@@ -357,14 +330,13 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    Log.d("test", "response success");
-                    showRoute(response);
+                    showRoute(response, bLat, bLong);
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     // put the error here
-                    Log.d("error", error.toString());
+                    Toast.makeText(getApplicationContext(), "Routing issues", Toast.LENGTH_SHORT).show();
                 }
             });
             // Add the request to the RequestQueue.
@@ -372,12 +344,11 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
 
         } catch (
                 JSONException e) {
-            Log.d("exception", "wrong");
-            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "Routing issues", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void showRoute(JSONObject obj) {
+    private void showRoute(JSONObject obj, String bLat, String bLong) {
         try {
 
             String result = (String) obj.get("result");
@@ -389,6 +360,8 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                 return;
             }
 
+            endLat = Double.parseDouble(bLat);
+            endLong = Double.parseDouble(bLong);
             JSONObject overview_polylineJson = obj.getJSONObject("overview_polyline");
             points = decodePolyLine(overview_polylineJson.getString("points"));
             route = new PolylineOptions().
@@ -406,9 +379,8 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
     private boolean checkIfOnRoute(double maxDistanceAway) {
         for(int i = 0;i<points.size();i++){
             double dist = distance(points.get(i).latitude,points.get(i).longitude,currentLocation.latitude,currentLocation.longitude);
-            if(dist<maxDistanceAway){
+            if(dist<maxDistanceAway)
                 return true;
-            }
         }
         return false;
     }
@@ -470,7 +442,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         return new Double(distance * meterConversion).doubleValue();
     }
 
-    public void sendUpdateWalkPOST(String email, String lon, String lat, String onRoute, String isActive) {
+    public void sendUpdateWalkPOST(String email, String lat, String lon, String onRoute, String isActive) {
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String url = getResources().getString(R.string.server_ip) + "walkUpdate";
 
@@ -478,21 +450,47 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             JSONObject jsonBody = new JSONObject();
 
             jsonBody.put("email", email);
-            jsonBody.put("long", lon);
-            jsonBody.put("lat", lat);
+            jsonBody.put("aLong", lon);
+            jsonBody.put("aLat", lat);
+            jsonBody.put("mode", determineMode());
+            jsonBody.put("bLong", endLong);
+            jsonBody.put("bLat", endLat);
             jsonBody.put("onRoute", onRoute);
             jsonBody.put("isActive", isActive);
             // Put your headers here
 
-            JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+            JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody,
+                    new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    //TODO update ETA and show new route
+                    try {
+                        String result = (String) response.get("result");
+                        if (result.equals("True")) {
+                            int ETA = (Integer) response.get("ETA");
+                            int mins = ETA/60;
+                            int secs = ETA%60;
+                            String ETAString = mins + ":" + secs;
+                            eta.setText(getString(R.string.eta, ETAString));
+                            Integer distance = (Integer) response.get("distance");
+                            String dist = String.valueOf(distance) + "m";
+                            distanceLeft.setText(dist);
+                            if (ETA < 30 || distance < 10)
+                                askToStop();
+                        }
+                        else {
+                            Toast.makeText(getApplicationContext(), "Maps Error.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        Toast.makeText(getApplicationContext(), "Routing error.",
+                                Toast.LENGTH_SHORT).show();
+                    }
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    // put the error here
+                    Toast.makeText(getApplicationContext(), "Routing error.",
+                            Toast.LENGTH_SHORT).show();
                 }
             });
             // Add the request to the RequestQueue.
@@ -500,8 +498,46 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
 
         } catch (
                 JSONException e) {
-            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "Routing error.",
+                    Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void stopWalk() {
+        active = false;
+        finishWalk.setVisibility(View.GONE);
+        searchView.setVisibility(View.VISIBLE);
+        lightWalk.setVisibility(View.VISIBLE);
+        safeWalk.setVisibility(View.VISIBLE);
+        torch.setVisibility(View.GONE);
+        if (line != null)
+            line.remove();
+        sendUpdateWalkPOST(email, Double.toString(currentLocation.latitude),
+                Double.toString(currentLocation.longitude),
+                Boolean.toString(onRoute), "0");
+    }
+
+    private void askToStop() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Have you arrived");
+        builder.setMessage("We have detected you are near your destination, do you wish to stop " +
+                "tracking?");
+        // Set up the buttons
+        builder.setPositiveButton("Finished Walk", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                stopWalk();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                Toast.makeText(getApplicationContext(), "Walk will continue",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.show();
     }
 
     private void getLastBestLocation() {
