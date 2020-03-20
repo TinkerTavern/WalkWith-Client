@@ -15,7 +15,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/alarm_button"
+        app:layout_constraintBottom_toTopOf="@id/distanceLeft"
         app:layout_constraintTop_toTopOf="parent"
         tools:context=".WalkingActivity" />
 
@@ -34,6 +34,28 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/distanceLeft"
+        android:layout_width="200dp"
+        android:layout_height="0dp"
+        android:text="@string/distanceLeft"
+        android:textSize="20sp"
+        android:layout_marginBottom="20dp"
+        android:textAlignment="textStart"
+        app:layout_constraintBottom_toTopOf="@id/alarm_button"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/eta"
+        android:layout_width="175dp"
+        android:layout_height="0dp"
+        android:text="@string/eta"
+        android:textAlignment="textEnd"
+        android:textSize="20sp"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/alarm_button" />
 
 
     <Button

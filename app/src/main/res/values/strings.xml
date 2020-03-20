@@ -46,6 +46,7 @@
     <string name="forgotten_password">Forgotten Password</string>
     <string name="username">Username</string>
     <string name="friends_online">Friends online: %1$s</string>
+    <string name="distanceLeft">Distance Left: %1$s</string>
     <string name="to_login">Already have an account? Login</string>
     <string name="alert">Alert Contacts</string>
     <string name="description">Placeholder Description</string>
