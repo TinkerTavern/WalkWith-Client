@@ -54,7 +54,8 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
     private Button alarmButton, startWalk, finishWalk, back;
     private SupportMapFragment mapFragment;
     private Switch safeWalk, lightWalk;
-    private boolean active, onRoute, gotLocation;
+    private boolean active, onRoute, gotLocation,
+            safeRoute = false,  lightRoute = false;
     private LatLng currentLocation, destination;
     private String email, mode;
     private Polyline line;
@@ -62,6 +63,12 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
     private Location currentBestLocation = null;
     private LocationManager mLocationManager;
     private List<LatLng> points;
+    /*
+    0 - Normal Route
+    1 - Safe route
+    2 - Light route
+    3 - Both
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,6 +145,28 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
+        safeWalk.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            safeRoute = !safeRoute;
+            if (buttonView.isChecked()) {
+                Toast.makeText(getApplicationContext(), "Will specifically avoid higher " +
+                                "crime rate areas", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Will not consider crime rates",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        lightWalk.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            lightRoute = !lightRoute;
+            if (buttonView.isChecked()) {
+                Toast.makeText(getApplicationContext(), "Will try to take you on the" +
+                                " lightest route", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Will not consider lighting",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
         finishWalk = findViewById(R.id.finish_walk);
         finishWalk.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -188,7 +217,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                     destination = new LatLng(address.getLatitude(), address.getLongitude());
                     Marker marker = gMap.addMarker(new MarkerOptions().position(destination).title(location));
                     gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destination, 10));
-                    sendDetermineRoutePOST(email, mode, Double.toString(currentLocation.latitude), Double.toString(currentLocation.longitude), Double.toString(destination.latitude), Double.toString(destination.longitude));
+                    sendDetermineRoutePOST(email, Double.toString(currentLocation.latitude), Double.toString(currentLocation.longitude), Double.toString(destination.latitude), Double.toString(destination.longitude));
                 } else {
                     Log.d("test", "failed attempt");
                 }
@@ -246,7 +275,16 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         }*/
     }
 
-    public void sendDetermineRoutePOST(String email, String mode, String aLat, String aLon, String bLat, String bLong) {
+    private String determineMode() {
+        int mode = 0;
+        if (safeRoute)
+            mode++;
+        if (lightRoute)
+            mode += 2;
+        return String.valueOf(mode);
+    }
+
+    public void sendDetermineRoutePOST(String email, String aLat, String aLon, String bLat, String bLong) {
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String url = getResources().getString(R.string.server_ip) + "determineRoute";
 
@@ -254,7 +292,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             JSONObject jsonBody = new JSONObject();
 
             jsonBody.put("email", email);
-            jsonBody.put("mode", "die");
+            jsonBody.put("mode", determineMode());
             jsonBody.put("aLong", aLon);
             jsonBody.put("aLat", aLat);
             jsonBody.put("bLong", bLong);
