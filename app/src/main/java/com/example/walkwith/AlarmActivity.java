@@ -59,7 +59,7 @@ public class AlarmActivity extends AppCompatActivity {
                             result = "Successfully alarmed contacts";
                         else
                             result = "Error in alerting contacts";
-                        Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
 
                     } catch (JSONException e) {
                         e.getMessage();

@@ -140,7 +140,7 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
 
     @Override
     public void onMyLocationClick(@NonNull Location location) {
-        Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_SHORT).show();
     }
 
     @Override

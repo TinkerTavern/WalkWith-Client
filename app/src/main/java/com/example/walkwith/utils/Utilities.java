@@ -55,7 +55,7 @@ public class Utilities {
                                 response.get("emails")).toArray(new String[0]);
 /*                        for (String a : emails) {
                             Log.d("test", a);
-                            Toast.makeText(parentContext, a, Toast.LENGTH_LONG).show();
+                            Toast.makeText(parentContext, a, Toast.LENGTH_SHORT).show();
 
                         }*/
                         AccountInfo.setFriendsList(emails);

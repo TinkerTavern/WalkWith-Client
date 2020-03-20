@@ -217,13 +217,13 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
                     grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 checkIfLocationOn();
             else
-                Toast.makeText(this, "Location services not allowed, functionality reduced", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Location services not allowed, functionality reduced", Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public void onMyLocationClick(@NonNull Location location) {
-        Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_SHORT).show();
     }
 
     @Override
