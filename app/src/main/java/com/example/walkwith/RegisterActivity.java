@@ -15,6 +15,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.walkwith.utils.Utilities;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -99,10 +100,10 @@ public class RegisterActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        validateLogin((String) response.get("result"));
+                        validateLogin((String) response.get("result"), email);
                         // Put the things you want to happen upon success
                     } catch (JSONException e) {
-                        validateLogin("JSON Error - " + e.getMessage());
+                        validateLogin("JSON Error - " + e.getMessage(), email);
                         // Put the error here
                     }
                 }
@@ -110,7 +111,7 @@ public class RegisterActivity extends AppCompatActivity {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     // put the error here
-                    validateLogin("Server Error - " + error.getMessage());
+                    validateLogin("Server Error - " + error.getMessage(), email);
                 }
             });
             // Add the request to the RequestQueue.
@@ -118,12 +119,14 @@ public class RegisterActivity extends AppCompatActivity {
 
         } catch (
                 JSONException e) {
-            validateLogin("Error - " + e.getMessage());
+            validateLogin("Error - " + e.getMessage(), email);
         }
     }
 
-    private void validateLogin(String response) {
+    private void validateLogin(String response, String email) {
         if (response.equals("True")) {
+            Utilities.updateTrustedContacts(this);
+            new AccountInfo(email);
             Toast.makeText(this, "Welcome, " + emailEditText.getText().toString(), Toast.LENGTH_SHORT).show();
             Intent myIntent = new Intent(RegisterActivity.this, MainMenu.class);
             finish();
