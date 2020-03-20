@@ -4,7 +4,10 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -46,6 +49,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static com.example.walkwith.MainMenu.isLocationEnabled;
 
 public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener, OnMapReadyCallback {
     private GoogleMap mMap;
@@ -173,6 +178,37 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
 
     }
 
+    public void enableLocationThings() {
+        mMap.setMyLocationEnabled(true);
+        mMap.setOnMyLocationButtonClickListener(this);
+        mMap.setOnMyLocationClickListener(this);
+        //TODO: Make it zoom to current location
+    }
+
+    private void checkIfLocationOn() {
+        if (isLocationEnabled(getApplicationContext()))
+            enableLocationThings();
+        else {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
+                    .setCancelable(false)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(final DialogInterface dialog, final int id) {
+                            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                            if (isLocationEnabled(getApplicationContext()))
+                                enableLocationThings();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(final DialogInterface dialog, final int id) {
+                            dialog.cancel();
+                        }
+                    });
+            final AlertDialog alert = builder.create();
+            alert.show();
+        }
+    }
+
     private void displayTrustedContactLoc(
             String[] emails, ArrayList<Double> lats, ArrayList<Double> longs){
         Marker mFriend;
@@ -182,7 +218,7 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         for(int i = 0; i < emails.length; i++){
             Log.e("mytag","" + i + ": " + emails[i] + "," + lats.get(i) + "," + longs.get(i));
             mFriend = mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(lats.get(i), longs.get(i)))
+                    .position(new LatLng(longs.get(i), lats.get(i)))
                     .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.profile_icon02, "" + emails[i])))
                     .anchor(0.5f,1)
             );

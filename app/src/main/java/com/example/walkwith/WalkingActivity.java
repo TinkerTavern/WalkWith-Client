@@ -1,5 +1,6 @@
 package com.example.walkwith;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -20,6 +21,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -53,9 +55,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class WalkingActivity extends AppCompatActivity implements OnMapReadyCallback {
+import static com.example.walkwith.MainMenu.isLocationEnabled;
 
-    private GoogleMap gMap;
+public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener, OnMapReadyCallback {
+
+    private GoogleMap mMap;
     private SearchView searchView;
     private Button alarmButton, startWalk, finishWalk, back;
     private SupportMapFragment mapFragment;
@@ -90,6 +94,8 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
 
         eta = findViewById(R.id.eta);
         distanceLeft = findViewById(R.id.distanceLeft);
+        eta.setText(getString(R.string.eta, "-"));
+        distanceLeft.setText(getString(R.string.distanceLeft, "-"));
 
         zoom = getIntent().getFloatExtra("cameraZoom", ZOOM_DEFAULT);
         latitude = getIntent().getDoubleExtra("cameraLat", LATLONG_DEFAULT);
@@ -150,21 +156,28 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                 lightWalk.setVisibility(View.GONE);
                 safeWalk.setVisibility(View.GONE);
                 torch.setVisibility(View.VISIBLE);
-                ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
-                exec.scheduleAtFixedRate(new Runnable() {
+                new Thread() {
                     @Override
                     public void run() {
-                        if (active) {
-                            getLastBestLocation();
-                            onRoute = checkIfOnRoute(100);
-                            sendUpdateWalkPOST(email, Double.toString(currentLocation.latitude),
-                                    Double.toString(currentLocation.longitude),
-                                    Boolean.toString(onRoute), "1");
-                            onRoute = true;
+                        while (true) {
+                            if (active) {
+                                getLastBestLocation();
+                                onRoute = checkIfOnRoute(100);
+                                sendUpdateWalkPOST(email, Double.toString(currentLocation.latitude),
+                                        Double.toString(currentLocation.longitude),
+                                        Boolean.toString(onRoute), "1");
+                                onRoute = true;
+                            }
+                            else
+                                break;
+                            try {
+                                Thread.sleep(5000);
+                            } catch (InterruptedException e) {
+                                break;
+                            }
                         }
-
                     }
-                }, 0, 5, TimeUnit.SECONDS);
+                }.start();
             }
         });
 
@@ -244,8 +257,8 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                     Address address = list.get(0);
                     Log.d("test", address.getAddressLine(0));
                     destination = new LatLng(address.getLatitude(), address.getLongitude());
-                    Marker marker = gMap.addMarker(new MarkerOptions().position(destination).title(location));
-                    gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destination, 10));
+                    Marker marker = mMap.addMarker(new MarkerOptions().position(destination).title(location));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destination, 10));
                     sendDetermineRoutePOST(email, Double.toString(currentLocation.latitude), Double.toString(currentLocation.longitude), Double.toString(destination.latitude), Double.toString(destination.longitude));
                 } else {
                     Log.d("test", "failed attempt");
@@ -288,14 +301,22 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        gMap = googleMap;
-
+        mMap = googleMap;
+        mMap.setMyLocationEnabled(true);
+        mMap.setOnMyLocationButtonClickListener(this);
+        mMap.setOnMyLocationClickListener(this);
+        View locationButton = ((View) findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+        // position on right bottom
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+        rlp.setMargins(0, 260, 180, 0);
         if (!zoom.equals(ZOOM_DEFAULT) && !latitude.equals(LATLONG_DEFAULT) &&
                 !longitude.equals(LATLONG_DEFAULT)) {
             LatLng latLng = new LatLng(latitude, longitude);
             CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
                     latLng, zoom);
-            gMap.animateCamera(location);
+            mMap.animateCamera(location);
         }
         else
             Toast.makeText(getApplicationContext(), "Map consistency error",
@@ -370,7 +391,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                     width(10);
             for (int i = 0; i < points.size(); i++)
                 route.add(points.get(i));
-            line = gMap.addPolyline(route);
+            line = mMap.addPolyline(route);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -539,11 +560,42 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         });
         builder.show();
     }
+    public void enableLocationThings() {
+        mMap.setMyLocationEnabled(true);
+        mMap.setOnMyLocationButtonClickListener(this);
+        mMap.setOnMyLocationClickListener(this);
+        //TODO: Make it zoom to current location
+    }
+
+    private void checkIfLocationOn() {
+        if (isLocationEnabled(getApplicationContext()))
+            enableLocationThings();
+        else {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
+                    .setCancelable(false)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(final DialogInterface dialog, final int id) {
+                            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                            if (isLocationEnabled(getApplicationContext()))
+                                enableLocationThings();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(final DialogInterface dialog, final int id) {
+                            dialog.cancel();
+                        }
+                    });
+            final AlertDialog alert = builder.create();
+            alert.show();
+        }
+    }
 
     private void getLastBestLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.
+                ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.
+                        ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // here to request the missing permissions, and then overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
             //                                          int[] grantResults)
@@ -555,19 +607,27 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         Location locationNet = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
         long GPSLocationTime = 0;
-        if (null != locationGPS) { GPSLocationTime = locationGPS.getTime(); }
+        if (null != locationGPS)
+            GPSLocationTime = locationGPS.getTime();
 
         long NetLocationTime = 0;
 
-        if (null != locationNet) {
+        if (null != locationNet)
             NetLocationTime = locationNet.getTime();
-        }
 
-        if ( 0 < GPSLocationTime - NetLocationTime ) {
+        if ( 0 < GPSLocationTime - NetLocationTime )
             currentLocation = new LatLng(locationGPS.getLatitude(), locationGPS.getLongitude());
-        }
-        else {
+        else
             currentLocation = new LatLng(locationNet.getLatitude(), locationNet.getLongitude());
-        }
+    }
+
+    @Override
+    public boolean onMyLocationButtonClick() {
+        return false;
+    }
+
+    @Override
+    public void onMyLocationClick(@NonNull Location location) {
+
     }
 }
