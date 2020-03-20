@@ -47,7 +47,8 @@ public class LoginActivity extends AppCompatActivity {
         String isRemember = preferences.getString("remember","");
         if (isRemember.equals("true")) {
             String email = preferences.getString("email","");
-            successfulLogin(email);
+            if (!email.equals(""))
+                successfulLogin(email);
         }
 
         rememberMe.setOnCheckedChangeListener((buttonView, isChecked) -> {
