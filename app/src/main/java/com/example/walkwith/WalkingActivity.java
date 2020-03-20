@@ -74,6 +74,7 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
     private LocationManager mLocationManager;
     private List<LatLng> points;
     private CameraManager camManager;
+    private Marker endPoint;
     private Double latitude, longitude, LATLONG_DEFAULT = 0d;
     private Float zoom, ZOOM_DEFAULT = 15f;
     private Double endLat, endLong;
@@ -257,8 +258,8 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
                     Address address = list.get(0);
                     Log.d("test", address.getAddressLine(0));
                     destination = new LatLng(address.getLatitude(), address.getLongitude());
-                    Marker marker = mMap.addMarker(new MarkerOptions().position(destination).title(location));
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destination, 10));
+                    endPoint = mMap.addMarker(new MarkerOptions().position(destination).title(location));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destination, 15f));
                     sendDetermineRoutePOST(email, Double.toString(currentLocation.latitude), Double.toString(currentLocation.longitude), Double.toString(destination.latitude), Double.toString(destination.longitude));
                 } else {
                     Log.d("test", "failed attempt");
@@ -531,6 +532,8 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
         lightWalk.setVisibility(View.VISIBLE);
         safeWalk.setVisibility(View.VISIBLE);
         torch.setVisibility(View.GONE);
+        if (endPoint != null)
+            endPoint.remove();
         if (line != null)
             line.remove();
         sendUpdateWalkPOST(email, Double.toString(currentLocation.latitude),
