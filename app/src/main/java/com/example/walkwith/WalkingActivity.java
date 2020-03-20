@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -53,16 +55,17 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
     private SearchView searchView;
     private Button alarmButton, startWalk, finishWalk, back;
     private SupportMapFragment mapFragment;
-    private Switch safeWalk, lightWalk;
+    private Switch safeWalk, lightWalk, torch;
     private boolean active, onRoute, gotLocation,
-            safeRoute = false,  lightRoute = false;
+            safeRoute = false,  lightRoute = false, cameraWorking = false;
     private LatLng currentLocation, destination;
-    private String email, mode;
+    private String email, cameraId;
     private Polyline line;
     private PolylineOptions route;
     private Location currentBestLocation = null;
     private LocationManager mLocationManager;
     private List<LatLng> points;
+    private CameraManager camManager;
     /*
     0 - Normal Route
     1 - Safe route
@@ -76,6 +79,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         setContentView(R.layout.activity_walking);
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapView2);
+
         try {
             Objects.requireNonNull(mapFragment).getMapAsync(this);
         } catch (NullPointerException e) {
@@ -92,6 +96,9 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
 
         safeWalk = findViewById(R.id.safeWalk);
         lightWalk = findViewById(R.id.lightWalk);
+        torch = findViewById(R.id.torch);
+        setupCamera();
+
         alarmButton = findViewById(R.id.alarm_button);
         alarmButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,6 +118,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                 startWalk.setVisibility(View.GONE);
                 lightWalk.setVisibility(View.VISIBLE);
                 safeWalk.setVisibility(View.VISIBLE);
+                torch.setVisibility(View.GONE);
             }
         });
 
@@ -127,6 +135,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                 searchView.setVisibility(View.GONE);
                 lightWalk.setVisibility(View.GONE);
                 safeWalk.setVisibility(View.GONE);
+                torch.setVisibility(View.VISIBLE);
                 ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
                 exec.scheduleAtFixedRate(new Runnable() {
                     @Override
@@ -143,6 +152,20 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                     }
                 }, 0, 5, TimeUnit.SECONDS);
             }
+        });
+
+        torch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (cameraWorking)
+                try {
+                    if (buttonView.isChecked())
+                        camManager.setTorchMode(cameraId, true);
+                    else
+                        camManager.setTorchMode(cameraId, false);
+                }
+                catch (CameraAccessException e) {
+                    Toast.makeText(getApplicationContext(), "Can't access camera for flash",
+                            Toast.LENGTH_SHORT).show();
+                }
         });
 
         safeWalk.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -176,6 +199,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                 searchView.setVisibility(View.VISIBLE);
                 lightWalk.setVisibility(View.VISIBLE);
                 safeWalk.setVisibility(View.VISIBLE);
+                torch.setVisibility(View.GONE);
                 if (line != null)
                     line.remove();
                 sendUpdateWalkPOST(email, Double.toString(currentLocation.latitude),
@@ -211,6 +235,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                     startWalk.setVisibility(View.VISIBLE);
                     lightWalk.setVisibility(View.GONE);
                     safeWalk.setVisibility(View.GONE);
+                    torch.setVisibility(View.GONE);
 
                     Address address = list.get(0);
                     Log.d("test", address.getAddressLine(0));
@@ -236,6 +261,20 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         startWalk.setVisibility(View.GONE);
         lightWalk.setVisibility(View.VISIBLE);
         safeWalk.setVisibility(View.VISIBLE);
+        torch.setVisibility(View.GONE);
+    }
+
+    private void setupCamera() {
+        try {
+            camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+            cameraId = camManager.getCameraIdList()[0]; // Usually front camera is at 0 position.
+            cameraWorking = true;
+        }
+        catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "Can't access camera for flash",
+                    Toast.LENGTH_SHORT).show();
+        }
+        torch.setClickable(cameraWorking);
     }
 
     protected void openAlarm() {
