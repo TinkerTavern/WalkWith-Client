@@ -10,6 +10,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.walkwith.utils.Utilities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -151,42 +152,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void getUserInfo(String email) {
-        getWatchEmailPOST("Account Info", email);
-        new AccountInfo(email, friendsList);
+        Utilities.updateTrustedContacts(this);
+        new AccountInfo(email);
     }
 
-    private void getWatchEmailPOST(String mode, String email) {
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        String url = getResources().getString(R.string.server_ip) + "account";
-        try {
-            JSONObject jsonBody = new JSONObject();
-            jsonBody.put("email", email);
-            jsonBody.put("mode", mode);
-            jsonBody.put("password","");
 
-            JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    try {
-                        convertToList((String[]) response.get("watchEmails"));
-                    } catch (JSONException e) {
-                        e.getMessage();
-                    }
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    error.getMessage();
-                }
-            });
-            queue.add(jsonObject);
-        } catch (
-                JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void convertToList(String[] watchEmails) {
-        friendsList = new ArrayList<String>(Arrays.asList(watchEmails));
-    }
 }
