@@ -45,14 +45,14 @@
     <string name="create_account">Create Account</string>
     <string name="forgotten_password">Forgotten Password</string>
     <string name="username">Username</string>
-    <string name="friends_online">Friends online: 0</string>
+    <string name="friends_online">Friends online: %1$s</string>
     <string name="to_login">Already have an account? Login</string>
     <string name="alert">Alert Contacts</string>
     <string name="description">Placeholder Description</string>
     <string name="nightline">You can find the number for Nightline on the reverse of your library
         card, or email on listening@bath.nightline.ac.uk</string>
     <string name="samaritans">Samaritans: 116 123</string>
-    <string name="eta">ETA - 22:55</string>
+    <string name="eta">ETA: %1$s</string>
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
     <string name="confirm_email">Confirm Email</string>
