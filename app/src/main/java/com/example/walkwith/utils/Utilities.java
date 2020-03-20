@@ -1,6 +1,9 @@
 package com.example.walkwith.utils;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -77,6 +80,24 @@ public class Utilities {
 
     public static ArrayList<String> listToArrayList(String[] list) {
         return new ArrayList<>(Arrays.asList(list));
+    }
+
+    public static void simpleMessage(Activity parentActivity, final String title, final String message) {
+        parentActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AlertDialog.Builder(parentActivity.getApplicationContext())
+                        .setTitle(title)
+                        .setMessage(message)
+                        .setCancelable(false)
+                        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Whatever...
+                            }
+                        }).show();
+            }
+        });
     }
 
 }

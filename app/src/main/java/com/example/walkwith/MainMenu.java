@@ -100,7 +100,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         try {
             Objects.requireNonNull(mapFragment).getMapAsync(this);
         } catch (NullPointerException e) {
-            alertDialog("Map loading error", e.getMessage());
+            Utilities.simpleMessage(this, "Map loading error", e.getMessage());
         }
         Button viewSettings = findViewById(R.id.settings); //Settings button
         Button viewTrustedContacts = findViewById(R.id.trustedContacts); //Trusted Contacts button
@@ -281,27 +281,6 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
             final AlertDialog alert = builder.create();
             alert.show();
         }
-    }
-
-    private void alertDialog(final String title, final String message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                if (!isFinishing()) {
-                    new AlertDialog.Builder(com.example.walkwith.MainMenu.this)
-                            .setTitle(title)
-                            .setMessage(message)
-                            .setCancelable(false)
-                            .setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Whatever...
-                                }
-                            }).show();
-                }
-            }
-        });
     }
 
     @Override
