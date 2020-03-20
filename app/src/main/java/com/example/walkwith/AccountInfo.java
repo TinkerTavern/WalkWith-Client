@@ -1,5 +1,7 @@
 package com.example.walkwith;
 
+import com.example.walkwith.utils.Utilities;
+
 import java.util.ArrayList;
 
 public class AccountInfo {
@@ -8,11 +10,15 @@ public class AccountInfo {
     private static ArrayList<String> friendsList;
     private static String friendFocusedOn;
 
-    public AccountInfo(/*String username,*/ String email, ArrayList<String> friendsList){
+    public AccountInfo(/*String username,*/ String email){
         //this.username = username;
         AccountInfo.email = email;
-        AccountInfo.friendsList = friendsList;
     }
+
+    public static void setFriendsList(String[] emails) {
+        AccountInfo.friendsList = Utilities.listToArrayList(emails);
+    }
+
 
     public static String getEmail() {
         return email;
