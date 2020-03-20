@@ -16,6 +16,8 @@ public class AccountInfo {
     }
 
     public static void setFriendsList(String[] emails) {
+        if (AccountInfo.friendsList != null)
+            AccountInfo.friendsList.clear();
         AccountInfo.friendsList = Utilities.listToArrayList(emails);
     }
 

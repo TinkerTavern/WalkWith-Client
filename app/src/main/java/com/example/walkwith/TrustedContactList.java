@@ -20,6 +20,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.walkwith.utils.Utilities;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -92,7 +93,7 @@ public class TrustedContactList extends AppCompatActivity implements MyRecyclerV
                             openInfo.putExtra("firstName", firstName);
                             openInfo.putExtra("surname", surname);
                             openInfo.putExtra("phoneNum", phoneNum);
-                            startActivity(openInfo);
+                            startActivityForResult(openInfo, 1);
                         }
                         else {
                             Toast.makeText(getApplicationContext(), "Error in retrieving " +
@@ -119,6 +120,14 @@ public class TrustedContactList extends AppCompatActivity implements MyRecyclerV
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1)
+            if (resultCode == 5)
+                removeItem();
+    }
+
     private void addContactPopup() {
         android.app.AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Add Contact");
@@ -126,14 +135,14 @@ public class TrustedContactList extends AppCompatActivity implements MyRecyclerV
         // Set up the input
         final EditText input = new EditText(this);
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
         builder.setView(input);
 
         // Set up the buttons
         builder.setPositiveButton("Add Contact", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                addContact(input.getText().toString());
+                addContactPOST(input.getText().toString());
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -150,9 +159,64 @@ public class TrustedContactList extends AppCompatActivity implements MyRecyclerV
     }
 
     private void addContact(String name){
-        String item = name;
         int insertIndex = 0;
-        trustedContactNames.add(insertIndex, item);
+        trustedContactNames.add(insertIndex, name);
         adapter.notifyItemInserted(insertIndex);
+    }
+
+    private void removeItem() {
+        trustedContactNames.remove(nameIndex);
+        adapter.notifyItemRemoved(nameIndex);
+    }
+
+    private void addContactPOST(String email) {
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        String url = getResources().getString(R.string.server_ip) + "trustedContacts";
+
+        try {
+            JSONObject jsonBody = new JSONObject();
+
+            jsonBody.put("email", AccountInfo.getEmail());
+            jsonBody.put("trustee", email);
+            jsonBody.put("mode", "add");
+
+            JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        String result = (String) response.get("result");
+                        if (result.equals("True")) {
+                            Toast.makeText(getApplicationContext(), "Contact added",
+                                    Toast.LENGTH_SHORT).show();
+                            Utilities.updateTrustedContacts(getApplicationContext());
+                            // To add new one
+                            addContact(email);
+
+                        }
+
+                        else
+                            Toast.makeText(getApplicationContext(), "User doesn't exist",
+                                    Toast.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        Toast.makeText(getApplicationContext(), "Error in adding contact, " +
+                                "please try again soon", Toast.LENGTH_SHORT).show();
+
+                    }
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // put the error here
+                    Toast.makeText(getApplicationContext(), "Error in adding contact, please try again soon", Toast.LENGTH_SHORT).show();
+                }
+            });
+            // Add the request to the RequestQueue.
+            queue.add(jsonObject);
+
+        } catch (
+                JSONException e) {
+            Toast.makeText(getApplicationContext(), "Error in adding contact, please try again soon", Toast.LENGTH_SHORT).show();
+        }
     }
 }
