@@ -1,5 +1,7 @@
 package com.example.walkwith;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -52,7 +54,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                validateInfo();
+                termsAndConditions();
             }
         });
 
@@ -137,4 +139,33 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
+    private void termsAndConditions() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Terms and Conditions");
+        builder.setMessage("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur mauris sem, tempus ut bibendum nec, maximus non risus. Integer iaculis est justo, sed pharetra elit volutpat a. Nunc cursus enim vel metus maximus facilisis. Cras eros sapien, congue id porttitor nec, egestas sit amet nunc. Mauris id sem tellus. Donec laoreet, nulla sit amet lacinia eleifend, dolor nulla rutrum eros, ac rutrum metus nisl sit amet arcu. Duis luctus viverra sem, eu ultricies lectus sodales ut. Duis vehicula volutpat neque et semper. Donec malesuada vel ante ac aliquet. Etiam et dolor sed justo scelerisque commodo sed vitae velit. Mauris leo felis, suscipit eu lacinia eget, suscipit sit amet nisl. Donec accumsan elit nec suscipit efficitur. Ut non lobortis tortor. Nam et tempus diam, ac vehicula sem. Morbi mauris mauris, accumsan eu urna ac, tempus interdum urna.\n" +
+                "\n" +
+                "Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam convallis sapien ut elit posuere, sed egestas velit sodales. Suspendisse hendrerit varius lorem, eu vehicula odio mattis a. Vestibulum leo sem, iaculis ut dapibus et, tristique id nunc. In hac habitasse platea dictumst. Donec et interdum neque, vitae ullamcorper metus. Etiam non erat sagittis, faucibus libero eu, commodo erat. Aenean vel magna ac tellus venenatis facilisis ut non turpis. Aenean tempor sed magna maximus consequat.\n" +
+                "\n" +
+                "Sed lobortis porttitor nulla, et sagittis ligula interdum sed. Etiam at mattis quam. Pellentesque molestie eros vitae arcu mollis, eget luctus urna mattis. Ut sed erat risus. Integer sagittis condimentum luctus. Aenean ligula dolor, aliquam sodales ex eu, lacinia iaculis lacus. Vivamus vitae mi eu nibh gravida tincidunt.\n" +
+                "\n" +
+                "Ut varius nulla eu facilisis convallis. Vestibulum mattis consectetur convallis. Suspendisse non tellus sodales, ullamcorper quam ac, cursus tellus. Ut molestie massa ut rutrum mollis. Suspendisse potenti. Integer maximus, neque at efficitur mattis, erat erat eleifend ex, sed pulvinar sem ligula quis leo. Pellentesque sodales vestibulum volutpat. Aenean faucibus consectetur varius. Donec vel tempor quam. Suspendisse ligula ex, scelerisque at cursus eu, facilisis ac massa. Suspendisse potenti. Phasellus pharetra lacus a risus aliquam elementum. Mauris quis metus posuere, tempor neque sit amet, lacinia lorem. Quisque eget velit varius, pulvinar dui et, tempor metus.\n" +
+                "\n" +
+                "Donec vitae risus ut augue sodales facilisis iaculis sollicitudin sapien. Donec lobortis ipsum accumsan velit fermentum, malesuada ornare dolor pretium. Vestibulum arcu leo, commodo sed pellentesque ut, pellentesque ac risus. Quisque sed sem id erat congue ornare. Curabitur sodales metus eu faucibus placerat. Nunc eleifend consequat eros, id lobortis arcu vehicula id. Etiam rhoncus metus dui, nec semper urna tincidunt a.");
+        // Set up the buttons
+        builder.setPositiveButton("Agree", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                validateInfo();
+            }
+        });
+        builder.setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(), "T&C's declined, app closing...", Toast.LENGTH_SHORT).show();
+                dialog.cancel();
+                finishAffinity();
+            }
+        });
+        builder.show();
+    }
 }

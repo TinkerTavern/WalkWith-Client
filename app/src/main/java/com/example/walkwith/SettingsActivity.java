@@ -65,7 +65,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void passwordPopup() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Enter your password below to confirm deletion of account");
+        builder.setTitle("Confirm Deletion");
+        builder.setMessage("Please enter your password below if you wish to delete your account");
         // Set up the input
         final EditText input = new EditText(this);
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
