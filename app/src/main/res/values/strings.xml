@@ -21,6 +21,13 @@
     <string name="surname">Surname</string>
     <string name="email">Email Address</string>
     <string name="phone">Phone Number</string>
+    <string name="search">Search…</string>
+    <string name="safeWalk">Safer Walk</string>
+    <string name="lightWalk">Brighter Walk</string>
+    <string name="finishWalk">Finish Walk</string>
+    <string name="startWalk">Start Walk</string>
+    <string name="back">Back</string>
+    <string name="alarm">Alarm</string>
     <!-- Preference Titles -->
 
     <!-- Messages Preferences -->

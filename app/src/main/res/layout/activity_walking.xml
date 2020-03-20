@@ -6,69 +6,118 @@
     android:layout_height="match_parent"
     tools:context=".WalkingActivity">
 
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/mapView2"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/alarm_button"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:context=".WalkingActivity" />
+
+    <SearchView
+        android:id="@+id/searchView"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginTop="30dp"
+        android:background="#7AC0C0C0"
+        android:foregroundTint="#00575555"
+        android:tooltipText="@string/search"
+        android:hint="@string/search"
+        android:label="@string/search"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <Button
         android:id="@+id/finish_walk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
+        android:visibility="gone"
+        android:background="#F44336"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#FFFFFF"
         android:layout_marginBottom="17dp"
-        android:text="Finish Walk"
+        android:text="@string/finishWalk"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
         android:id="@+id/back"
-        android:layout_width="wrap_content"
+        android:layout_width="125dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginBottom="17dp"
-        android:text="Back"
+        android:visibility="gone"
+        android:layout_marginBottom="15dp"
+        android:background="#F44336"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#FFFFFF"
+        android:text="@string/back"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/start_walk"
-        android:layout_width="wrap_content"
+        android:layout_width="125dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
-        android:layout_marginBottom="17dp"
-        android:text="Start Walk"
+        android:visibility="gone"
+        android:layout_marginBottom="15dp"
+        android:text="@string/startWalk"
+        android:background="#F44336"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/mapView2"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="0dp"
-        android:layout_height="606dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+    <Switch
+        android:id="@+id/lightWalk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textColor="#F44336"
+        android:textSize="18sp"
+        android:layout_marginBottom="25dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:context=".WalkingActivity" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:theme="@style/WWSwitch"
+        android:layout_centerHorizontal="true"
+        android:text="@string/lightWalk" />
 
-    <SearchView
-        android:id="@+id/searchView"
-        android:layout_width="411dp"
-        android:layout_height="73dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="463dp"
-        android:background="#7AC0C0C0"
-        android:foregroundTint="#00575555"
-        android:tooltipText="Search"
-        app:layout_constraintBottom_toTopOf="@+id/alarm_button"
+    <Switch
+        android:id="@+id/safeWalk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textColor="#F44336"
+        android:textSize="18sp"
+        android:layout_marginBottom="25dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:theme="@style/WWSwitch"
+        android:text="@string/safeWalk" />
 
     <Button
         android:id="@+id/alarm_button"
-        android:layout_width="wrap_content"
+        android:layout_width="125dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="17dp"
-        android:text="alarm"
+        android:layout_marginBottom="15dp"
+        android:text="@string/alarm"
+        android:background="#F44336"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
