@@ -28,6 +28,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -66,6 +67,8 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
     private LocationManager mLocationManager;
     private List<LatLng> points;
     private CameraManager camManager;
+    private Double latitude, longitude, LATLONG_DEFAULT = 0d;
+    private Float zoom, ZOOM_DEFAULT = 15f;
     /*
     0 - Normal Route
     1 - Safe route
@@ -80,6 +83,9 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapView2);
 
+        zoom = getIntent().getFloatExtra("cameraZoom", ZOOM_DEFAULT);
+        latitude = getIntent().getDoubleExtra("cameraLat", LATLONG_DEFAULT);
+        longitude = getIntent().getDoubleExtra("cameraLong", LATLONG_DEFAULT);
         try {
             Objects.requireNonNull(mapFragment).getMapAsync(this);
         } catch (NullPointerException e) {
@@ -286,7 +292,16 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
     public void onMapReady(GoogleMap googleMap) {
         gMap = googleMap;
 
-
+        if (!zoom.equals(ZOOM_DEFAULT) && !latitude.equals(LATLONG_DEFAULT) &&
+                !longitude.equals(LATLONG_DEFAULT)) {
+            LatLng latLng = new LatLng(latitude, longitude);
+            CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
+                    latLng, zoom);
+            gMap.animateCamera(location);
+        }
+        else
+            Toast.makeText(getApplicationContext(), "Map consistency error",
+                    Toast.LENGTH_SHORT).show();
         //hardcoded test for the show route method
         /*getUserLocation();
         line = gMap.addPolyline(route);

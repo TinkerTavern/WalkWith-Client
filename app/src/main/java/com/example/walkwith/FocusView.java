@@ -26,11 +26,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.walkwith.utils.Utilities;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -50,6 +52,8 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
     private Polyline line;
     private PolylineOptions route;
     private LatLng friendLocation;
+    private Double latitude, longitude, LATLONG_DEFAULT = 0d;
+    private Float zoom, ZOOM_DEFAULT = 15f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +61,9 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         setContentView(R.layout.activity_focus_view);
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        zoom = getIntent().getFloatExtra("cameraZoom", ZOOM_DEFAULT);
+        latitude = getIntent().getDoubleExtra("cameraLat", LATLONG_DEFAULT);
+        longitude = getIntent().getDoubleExtra("cameraLong", LATLONG_DEFAULT);
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView2);
         try {
@@ -88,6 +95,18 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
         sendGetFriendRoutePOST(AccountInfo.getEmail(),AccountInfo.getFriendFocusedOn());
+        if (!zoom.equals(ZOOM_DEFAULT) && !latitude.equals(LATLONG_DEFAULT) &&
+                !longitude.equals(LATLONG_DEFAULT)) {
+            LatLng latLng = new LatLng(latitude, longitude);
+            CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
+                    latLng, zoom);
+            mMap.animateCamera(location);
+        }
+        else
+            Toast.makeText(getApplicationContext(), "Map consistency error",
+                    Toast.LENGTH_SHORT).show();
+
+
     }
 
     private void updateViewPOST(String email) { // TODO Make this a general function

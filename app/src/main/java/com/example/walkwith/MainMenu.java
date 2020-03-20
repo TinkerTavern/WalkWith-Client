@@ -43,6 +43,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -145,11 +146,19 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
 
     protected void viewActiveWalkers() {
         Intent viewWalkers = new Intent (this, FocusView.class);
+        CameraPosition position =  mMap.getCameraPosition();
+        viewWalkers.putExtra("cameraLat", position.target.latitude);
+        viewWalkers.putExtra("cameraLong", position.target.longitude);
+        viewWalkers.putExtra("cameraZoom", position.zoom);
         startActivity(viewWalkers);
     }
 
     protected void openWalking(){
         Intent openWalking = new Intent(this, WalkingActivity.class);
+        CameraPosition position =  mMap.getCameraPosition();
+        openWalking.putExtra("cameraLat", position.target.latitude);
+        openWalking.putExtra("cameraLong", position.target.longitude);
+        openWalking.putExtra("cameraZoom", position.zoom);
         startActivity(openWalking);
     }
 
@@ -281,11 +290,15 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        if(Objects.equals(marker.getTag(), 1))
+        if (Objects.equals(marker.getTag(), 1))
             AccountInfo.setFriendFocusedOn(marker.getTitle());
-            Intent focusView = new Intent (this, FocusView.class);
-            startActivity(focusView);
-            return false;
+        Intent focusView = new Intent(this, FocusView.class);
+        CameraPosition position = mMap.getCameraPosition();
+        focusView.putExtra("cameraLat", position.target.latitude);
+        focusView.putExtra("cameraLong", position.target.longitude);
+        focusView.putExtra("cameraZoom", position.zoom);
+        startActivity(focusView);
+        return false;
     }
 
     private String getUrl(LatLng origin, LatLng dest, String directionMode) {
