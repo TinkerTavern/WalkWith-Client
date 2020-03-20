@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SearchView;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -52,6 +53,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
     private SearchView searchView;
     private Button alarmButton, startWalk, finishWalk, back;
     private SupportMapFragment mapFragment;
+    private Switch safeWalk, lightWalk;
     private boolean active, onRoute, gotLocation;
     private LatLng currentLocation, destination;
     private String email, mode;
@@ -81,6 +83,8 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                 color(Color.BLUE).
                 width(10);
 
+        safeWalk = findViewById(R.id.safeWalk);
+        lightWalk = findViewById(R.id.lightWalk);
         alarmButton = findViewById(R.id.alarm_button);
         alarmButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,9 +98,12 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onClick(View v) {
                 destination = null;
-                line.remove();
+                if (line != null)
+                    line.remove();
                 back.setVisibility(View.GONE);
                 startWalk.setVisibility(View.GONE);
+                lightWalk.setVisibility(View.VISIBLE);
+                safeWalk.setVisibility(View.VISIBLE);
             }
         });
 
@@ -111,6 +118,8 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                 startWalk.setVisibility(View.GONE);
                 finishWalk.setVisibility(View.VISIBLE);
                 searchView.setVisibility(View.GONE);
+                lightWalk.setVisibility(View.GONE);
+                safeWalk.setVisibility(View.GONE);
                 ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
                 exec.scheduleAtFixedRate(new Runnable() {
                     @Override
@@ -136,7 +145,10 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                 active = false;
                 finishWalk.setVisibility(View.GONE);
                 searchView.setVisibility(View.VISIBLE);
-                line.remove();
+                lightWalk.setVisibility(View.VISIBLE);
+                safeWalk.setVisibility(View.VISIBLE);
+                if (line != null)
+                    line.remove();
                 sendUpdateWalkPOST(email, Double.toString(currentLocation.latitude),
                         Double.toString(currentLocation.longitude),
                         Boolean.toString(onRoute), "0");
@@ -144,7 +156,11 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
         searchView = findViewById(R.id.searchView);
+        searchView.setIconified(false);
+        //The above line will expand it to fit the area as well as throw up the keyboard
 
+        //To remove the keyboard, but make sure you keep the expanded version:
+        searchView.clearFocus();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -164,6 +180,8 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                 if (list != null && !list.isEmpty()) {
                     back.setVisibility(View.VISIBLE);
                     startWalk.setVisibility(View.VISIBLE);
+                    lightWalk.setVisibility(View.GONE);
+                    safeWalk.setVisibility(View.GONE);
 
                     Address address = list.get(0);
                     Log.d("test", address.getAddressLine(0));
@@ -187,6 +205,8 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         finishWalk.setVisibility(View.GONE);
         back.setVisibility(View.GONE);
         startWalk.setVisibility(View.GONE);
+        lightWalk.setVisibility(View.VISIBLE);
+        safeWalk.setVisibility(View.VISIBLE);
     }
 
     protected void openAlarm() {
