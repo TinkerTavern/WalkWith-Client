@@ -197,16 +197,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
 
         //UNCOMMENT THIS TO SHOW ROUTE BETWEEN 2 POINTS
         //new FetchURL(MainMenu.this).execute(url,"walking");
-
-        //Simple line between 2 points
-        Polyline polyline1 = mMap.addPolyline(new PolylineOptions()
-                .clickable(true)
-                .add(
-                        new LatLng(51, 2.3),
-                        new LatLng(51, 2.6)));
-
-        mMap.addMarker(place1);
-        mMap.addMarker(place2);
+//
 
         // Set listeners for click events.
         /*googleMap.setOnPolylineClickListener(this);
