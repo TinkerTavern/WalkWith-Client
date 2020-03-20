@@ -153,8 +153,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void getUserInfo(String email) {
-        Utilities.updateTrustedContacts(this);
         new AccountInfo(email);
+        Utilities.updateTrustedContacts(this);
     }
 
 

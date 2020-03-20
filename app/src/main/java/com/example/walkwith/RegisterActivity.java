@@ -127,8 +127,8 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void validateLogin(String response, String email) {
         if (response.equals("True")) {
-            Utilities.updateTrustedContacts(this);
             new AccountInfo(email);
+            Utilities.updateTrustedContacts(this);
             Toast.makeText(this, "Welcome, " + emailEditText.getText().toString(), Toast.LENGTH_SHORT).show();
             Intent myIntent = new Intent(RegisterActivity.this, MainMenu.class);
             finish();
