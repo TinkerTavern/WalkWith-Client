@@ -1,10 +1,15 @@
 package com.example.walkwith;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,14 +46,49 @@ public class SettingsActivity extends AppCompatActivity {
                 editor.apply();
                 Log.d("test", "there");
             }
-            Intent returnToLogin = new Intent(this, LoginActivity.class);
-            startActivity(returnToLogin);
-            finishAffinity(); // Closes all other activities
+            returnToLogin();
         });
 
         deleteAccountButton.setOnClickListener(v -> {
-            deleteAccountPost("delete", "3", "3");
+            passwordPopup();
         });
+    }
+
+    private void returnToLogin() {
+        SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("remember", "false");
+        editor.putString("email", "");
+        editor.apply();
+        Intent returnToLogin = new Intent(this, LoginActivity.class);
+        startActivity(returnToLogin);
+        finishAffinity(); // Closes all other activities
+    }
+
+    private void passwordPopup() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirm deletion");
+
+        // Set up the input
+        final EditText input = new EditText(this);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                deleteAccountPost("delete", AccountInfo.getEmail(), input.getText().toString());
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
     }
 
     public void deleteAccountPost(String mode, String email, String password) {
@@ -64,7 +104,18 @@ public class SettingsActivity extends AppCompatActivity {
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    finishAffinity();
+                    try {
+                        String result = response.getString("result");
+                        if (result.equals("True")) {
+                            result = "Successful deletion, returning to login";
+                            returnToLogin();
+                        }
+                        else
+                            result = "Delete account was unsuccessful, please try again";
+                        Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -78,15 +129,6 @@ public class SettingsActivity extends AppCompatActivity {
         } catch (
                 JSONException e) {
             e.printStackTrace();
-        }
-    }
-
-
-
-    public static class SettingsFragment extends PreferenceFragmentCompat {
-        @Override
-        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-//            setPreferencesFromResource(R.xml.root_preferences, rootKey);
         }
     }
 }
