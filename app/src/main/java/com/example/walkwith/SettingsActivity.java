@@ -1,6 +1,5 @@
 package com.example.walkwith;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,7 +12,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.PreferenceFragmentCompat;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -67,8 +65,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void passwordPopup() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Confirm deletion");
-
+        builder.setTitle("Enter your password below to confirm deletion of account");
         // Set up the input
         final EditText input = new EditText(this);
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
