@@ -126,9 +126,4 @@ public class TrustedContactList extends AppCompatActivity implements MyRecyclerV
             Toast.makeText(this, "Nothing to remove", Toast.LENGTH_SHORT).show();
 
     }
-
-    protected void openList(){
-        Intent openList = new Intent(this, TrustedContacts.class);
-        startActivity(openList);
-    }
 }
