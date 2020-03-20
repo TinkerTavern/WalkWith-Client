@@ -35,7 +35,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -130,9 +129,10 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
                         String[] Longs = Utilities.jsonArrayToList((JSONArray) response.get("longs")).toArray(new String[0]);
                         String[] Lats = Utilities.jsonArrayToList((JSONArray) response.get("lats")).toArray(new String[0]);
                         String[] emails = Utilities.jsonArrayToList((JSONArray) response.get("emails")).toArray(new String[0]);
+                        String[] lastUpdates = Utilities.jsonArrayToList((JSONArray) response.get("lastUpdated")).toArray(new String[0]);
                         ArrayList<Double> longsList = convertToDouble(Longs);
                         ArrayList<Double> latsList = convertToDouble(Lats);
-                        displayTrustedContactLoc(emails, latsList, longsList); // TODO: Also get the route they are going on
+                        displayTrustedContactLoc(emails, latsList, longsList, lastUpdates); // TODO: Also get the route they are going on
                     } catch (JSONException e) {
                         e.getMessage();
                     }
@@ -209,17 +209,17 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         }
     }
 
-    private void displayTrustedContactLoc(
-            String[] emails, ArrayList<Double> lats, ArrayList<Double> longs){
+    private void displayTrustedContactLoc(String[] emails, ArrayList<Double> lats, ArrayList<Double>
+            longs, String[] lastUpdated){
         Marker mFriend;
 
         if (mMap == null)
             return;
         for(int i = 0; i < emails.length; i++){
-            Log.e("mytag","" + i + ": " + emails[i] + "," + lats.get(i) + "," + longs.get(i));
+            Log.e("mytag","" + i + ": " + emails[i] + "," + lats.get(i) + "," + longs.get(i) + "," + lastUpdated[i]);
             mFriend = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(longs.get(i), lats.get(i)))
-                    .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.profile_icon02, "" + emails[i])))
+                    .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.active_icon, "" + emails[i])))
                     .anchor(0.5f,1)
             );
             mFriend.setTag(i);

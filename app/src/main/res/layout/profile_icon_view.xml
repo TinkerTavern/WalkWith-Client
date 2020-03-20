@@ -10,7 +10,7 @@
         android:layout_height="48dp"
         android:layout_gravity="center_horizontal"
         android:contentDescription="@null"
-        android:src="@drawable/profile_icon02" />
+        android:src="@drawable/active_icon" />
 
     <TextView
         android:id="@+id/text_view"

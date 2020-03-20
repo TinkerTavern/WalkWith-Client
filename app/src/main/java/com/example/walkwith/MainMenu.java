@@ -38,7 +38,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import com.example.walkwith.utils.Utilities;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -55,6 +54,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -63,9 +63,8 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     private GoogleMap mMap;
     private int MY_LOCATION_REQUEST_CODE = 1;
+    private ArrayList<Marker> friendMarkers = new ArrayList<>();
 
-    //Random Friends
-    private MarkerOptions place1, place2;
 
     Polyline route;
     Thread trustThread;
@@ -80,7 +79,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        trustThread = new  Thread() {
+        trustThread = new Thread() {
             public void run() {
                 // do stuff
                 while (true) {
@@ -110,13 +109,10 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         startNewWalk.setOnClickListener(this);
 
 
-
-        place1 = new MarkerOptions().position(new LatLng(27.658143, 85.3199503)).title("Location 1");
-        place2 = new MarkerOptions().position(new LatLng(27.667491, 85.3208583)).title("Location 2");
     }
 
     @Override
-    public void onClick(View v){
+    public void onClick(View v) {
         switch (v.getId()) {
             case R.id.settings:
                 openSettings();
@@ -133,29 +129,29 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         }
     }
 
-    protected void openSettings(){
+    protected void openSettings() {
         Intent openSettings = new Intent(this, SettingsActivity.class);
         startActivity(openSettings);
     }
 
     protected void viewTrustedContacts() {
         Utilities.updateTrustedContacts(this);
-        Intent openContacts = new Intent (this, TrustedContactList.class);
+        Intent openContacts = new Intent(this, TrustedContactList.class);
         startActivity(openContacts);
     }
 
     protected void viewActiveWalkers() {
-        Intent viewWalkers = new Intent (this, FocusView.class);
-        CameraPosition position =  mMap.getCameraPosition();
+        Intent viewWalkers = new Intent(this, FocusView.class);
+        CameraPosition position = mMap.getCameraPosition();
         viewWalkers.putExtra("cameraLat", position.target.latitude);
         viewWalkers.putExtra("cameraLong", position.target.longitude);
         viewWalkers.putExtra("cameraZoom", position.zoom);
         startActivity(viewWalkers);
     }
 
-    protected void openWalking(){
+    protected void openWalking() {
         Intent openWalking = new Intent(this, WalkingActivity.class);
-        CameraPosition position =  mMap.getCameraPosition();
+        CameraPosition position = mMap.getCameraPosition();
         openWalking.putExtra("cameraLat", position.target.latitude);
         openWalking.putExtra("cameraLong", position.target.longitude);
         openWalking.putExtra("cameraZoom", position.zoom);
@@ -193,16 +189,6 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
 
         mMap.setOnMarkerClickListener(this);
 
-        String url = getUrl(place1.getPosition(), place2.getPosition(), "walking");
-
-        //UNCOMMENT THIS TO SHOW ROUTE BETWEEN 2 POINTS
-        //new FetchURL(MainMenu.this).execute(url,"walking");
-//
-
-        // Set listeners for click events.
-        /*googleMap.setOnPolylineClickListener(this);
-        googleMap.setOnPolygonClickListener(this);*/
-
     }
 
     @Override
@@ -237,8 +223,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         //TODO: Make it zoom to current location
     }
 
-    public static Boolean isLocationEnabled(Context context)
-    {
+    public static Boolean isLocationEnabled(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             // This is new method provided in API 28
             LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -246,12 +231,11 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
                 return lm.isLocationEnabled();
             else
                 return false;
-        }
-        else {
+        } else {
             // This is Deprecated in API 28
             int mode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE,
                     Settings.Secure.LOCATION_MODE_OFF);
-            return  (mode != Settings.Secure.LOCATION_MODE_OFF);
+            return (mode != Settings.Secure.LOCATION_MODE_OFF);
         }
     }
 
@@ -292,23 +276,6 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         return false;
     }
 
-    private String getUrl(LatLng origin, LatLng dest, String directionMode) {
-        // Origin of route
-        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
-        // Destination of route
-        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
-        // Mode
-        String mode = "mode=" + directionMode;
-        // Building the parameters to the web service
-        String parameters = str_origin + "&" + str_dest + "&" + mode;
-        // Output format
-        String output = "json";
-        // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + "AIzaSyBduaZIXEGGMPnEXcYQERJS5pFOvCG0i20";
-        //TODO Why is the key written here in plaintext?
-        return url;
-    }
-
     @Override
     public void onTaskDone(Object... values) {
         if (route != null)
@@ -332,9 +299,10 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
                         String[] Longs = Utilities.jsonArrayToList((JSONArray) response.get("longs")).toArray(new String[0]);
                         String[] Lats = Utilities.jsonArrayToList((JSONArray) response.get("lats")).toArray(new String[0]);
                         String[] emails = Utilities.jsonArrayToList((JSONArray) response.get("emails")).toArray(new String[0]);
+                        String[] lastUpdates = Utilities.jsonArrayToList((JSONArray) response.get("lastUpdated")).toArray(new String[0]);
                         ArrayList<Double> longsList = convertToDouble(Longs);
                         ArrayList<Double> latsList = convertToDouble(Lats);
-                        displayTrustedContactLoc(emails, latsList, longsList);
+                        displayTrustedContactLoc(emails, latsList, longsList, lastUpdates);
 
                     } catch (JSONException e) {
                         e.getMessage();
@@ -356,24 +324,40 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
 
     private ArrayList<Double> convertToDouble(String[] array) {
         ArrayList<Double> doubleList = new ArrayList<>();
-        for(String numbers:array){
+        for (String numbers : array) {
             doubleList.add(Double.valueOf(numbers));
         }
         return doubleList;
     }
 
     private void displayTrustedContactLoc(
-            String[] emails, ArrayList<Double> lats, ArrayList<Double> longs){
+            String[] emails, ArrayList<Double> lats, ArrayList<Double> longs, String[] lastUpdated) {
         Marker mFriend;
+        // Remove all the old ones first
+        if (friendMarkers.size() > 0) {
+            for (Marker m : friendMarkers)
+                m.remove();
+            friendMarkers.clear();
+        }
 
-        for(int i = 0; i < emails.length; i++){
-            Log.e("mytag","" + i + ": " + emails[i] + "," + lats.get(i) + "," + longs.get(i));
+        for (int i = 0; i < emails.length; i++) {
+            Log.e("mytag", "" + i + ": " + emails[i] + "," + longs.get(i) + "," + lats.get(i) + "," + lastUpdated[i]);
+            String oldLast = lastUpdated[i];
+            String last = oldLast.substring(0,10)+'T'+oldLast.substring(11);
+            LocalDateTime lastOnDate = LocalDateTime.parse(last);
+            LocalDateTime minsAgo = LocalDateTime.now().minusMinutes(5);
+            int drawable;
+            if (minsAgo.compareTo(lastOnDate) > 0)
+                drawable = R.drawable.offline_icon;
+            else
+                drawable = R.drawable.active_icon;
             mFriend = mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(lats.get(i), longs.get(i)))
-                    .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.profile_icon02, "" + emails[i])))
+                    .position(new LatLng(longs.get(i), lats.get(i)))
+                    .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(drawable, "" + emails[i])))
                     .title(emails[i])
-                    .anchor(0.5f,1)
+                    .anchor(0.5f, 1)
             );
+            friendMarkers.add(mFriend);
             mFriend.setTag(1);
         }
     }
