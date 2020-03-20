@@ -40,6 +40,7 @@
         android:layout_width="200dp"
         android:layout_height="0dp"
         android:text="@string/distanceLeft"
+        android:layout_marginStart="10dp"
         android:textSize="20sp"
         android:layout_marginBottom="20dp"
         android:textAlignment="textStart"
@@ -53,6 +54,7 @@
         android:text="@string/eta"
         android:textAlignment="textEnd"
         android:textSize="20sp"
+        android:layout_marginEnd="10dp"
         android:layout_marginBottom="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/alarm_button" />
@@ -130,6 +132,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:theme="@style/WWSwitch"
+        android:layout_marginStart="10dp"
         android:layout_centerHorizontal="true"
         android:text="@string/lightWalk" />
 
@@ -144,6 +147,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:theme="@style/WWSwitch"
+        android:layout_marginEnd="10dp"
         android:text="@string/safeWalk" />
 
     <Button
