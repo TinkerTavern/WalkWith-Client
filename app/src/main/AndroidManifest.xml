@@ -31,10 +31,6 @@
         <activity android:name=".ContactInfo" />
         <activity android:name=".TrustedContactList" />
         <activity
-            android:name=".TrustedContacts"
-            android:label="@string/title_activity_trusted_contacts"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".AlarmActivity"
             android:label="@string/title_activity_alarm"
             android:theme="@style/AppTheme.NoActionBar" />
