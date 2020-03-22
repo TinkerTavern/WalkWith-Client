@@ -33,13 +33,6 @@ public class AlarmActivity extends AppCompatActivity {
         alertContactButton.setOnClickListener(view -> {
             alertPOST(AccountInfo.getEmail());
         });
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            }
-        });
     }
 
     private void alertPOST(String email) {
