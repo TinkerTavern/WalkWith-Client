@@ -23,8 +23,6 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-
-
         <Button
             android:id="@+id/alertContacts"
             android:layout_width="243dp"
