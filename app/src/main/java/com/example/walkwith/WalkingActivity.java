@@ -65,7 +65,7 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
     private SupportMapFragment mapFragment;
     private Switch safeWalk, lightWalk, torch;
     private boolean active, onRoute, gotLocation,
-            safeRoute = false,  lightRoute = false, cameraWorking = false;
+            safeRoute = false,  lightRoute = false, cameraWorking = false, searched = false;
     private LatLng currentLocation, destination;
     private String email, cameraId;
     private Polyline line;
@@ -133,10 +133,13 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
             @Override
             public void onClick(View v) {
                 destination = null;
+                searched = false;
                 if (line != null)
                     line.remove();
                 back.setVisibility(View.GONE);
                 startWalk.setVisibility(View.GONE);
+                distanceLeft.setVisibility(View.GONE);
+                eta.setVisibility(View.GONE);
                 lightWalk.setVisibility(View.VISIBLE);
                 safeWalk.setVisibility(View.VISIBLE);
                 torch.setVisibility(View.GONE);
@@ -155,6 +158,8 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
                 finishWalk.setVisibility(View.VISIBLE);
                 searchView.setVisibility(View.GONE);
                 lightWalk.setVisibility(View.GONE);
+                distanceLeft.setVisibility(View.VISIBLE);
+                eta.setVisibility(View.VISIBLE);
                 safeWalk.setVisibility(View.GONE);
                 torch.setVisibility(View.VISIBLE);
                 new Thread() {
@@ -198,24 +203,26 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
 
         safeWalk.setOnCheckedChangeListener((buttonView, isChecked) -> {
             safeRoute = !safeRoute;
-            if (buttonView.isChecked()) {
+            if (buttonView.isChecked())
                 Toast.makeText(getApplicationContext(), "Will specifically avoid higher " +
                                 "crime rate areas", Toast.LENGTH_SHORT).show();
-            } else {
+            else
                 Toast.makeText(getApplicationContext(), "Will not consider crime rates",
                         Toast.LENGTH_SHORT).show();
-            }
+            if (searched)
+                searchView.setQuery(searchView.getQuery(), true);
         });
 
         lightWalk.setOnCheckedChangeListener((buttonView, isChecked) -> {
             lightRoute = !lightRoute;
-            if (buttonView.isChecked()) {
+            if (buttonView.isChecked())
                 Toast.makeText(getApplicationContext(), "Will try to take you on the" +
                                 " lightest route", Toast.LENGTH_SHORT).show();
-            } else {
+            else
                 Toast.makeText(getApplicationContext(), "Will not consider lighting",
                         Toast.LENGTH_SHORT).show();
-            }
+            if (searched)
+                searchView.setQuery(searchView.getQuery(), true);
         });
 
         finishWalk = findViewById(R.id.finish_walk);
@@ -251,8 +258,6 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
                 if (list != null && !list.isEmpty()) {
                     back.setVisibility(View.VISIBLE);
                     startWalk.setVisibility(View.VISIBLE);
-                    lightWalk.setVisibility(View.GONE);
-                    safeWalk.setVisibility(View.GONE);
                     torch.setVisibility(View.GONE);
 
                     Address address = list.get(0);
@@ -261,6 +266,7 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
                     endPoint = mMap.addMarker(new MarkerOptions().position(destination).title(location));
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destination, 15f));
                     sendDetermineRoutePOST(email, Double.toString(currentLocation.latitude), Double.toString(currentLocation.longitude), Double.toString(destination.latitude), Double.toString(destination.longitude));
+                    searched = true;
                 } else {
                     Log.d("test", "failed attempt");
                 }
@@ -277,6 +283,8 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
         finishWalk.setVisibility(View.GONE);
         back.setVisibility(View.GONE);
         startWalk.setVisibility(View.GONE);
+        distanceLeft.setVisibility(View.GONE);
+        eta.setVisibility(View.GONE);
         lightWalk.setVisibility(View.VISIBLE);
         safeWalk.setVisibility(View.VISIBLE);
         torch.setVisibility(View.GONE);
@@ -372,7 +380,8 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
 
     private void showRoute(JSONObject obj, String bLat, String bLong) {
         try {
-
+            if (line != null)
+                line.remove();
             String result = (String) obj.get("result");
             Log.d("test", result);
 
@@ -530,11 +539,14 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
     }
 
     private void stopWalk() {
+        searched = false;
         active = false;
         finishWalk.setVisibility(View.GONE);
         searchView.setVisibility(View.VISIBLE);
         lightWalk.setVisibility(View.VISIBLE);
         safeWalk.setVisibility(View.VISIBLE);
+        distanceLeft.setVisibility(View.GONE);
+        eta.setVisibility(View.GONE);
         torch.setVisibility(View.GONE);
         if (endPoint != null)
             endPoint.remove();

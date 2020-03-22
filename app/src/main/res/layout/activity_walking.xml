@@ -11,21 +11,21 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="15dp"
+        android:layout_marginBottom="55dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/distanceLeft"
+        app:layout_constraintBottom_toTopOf="@id/alarm_button"
         app:layout_constraintTop_toTopOf="parent"
         tools:context=".WalkingActivity" />
 
     <SearchView
         android:id="@+id/searchView"
         android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginTop="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="20dp"
         android:background="#7AC0C0C0"
         android:foregroundTint="#00575555"
         android:tooltipText="@string/search"
@@ -44,6 +44,7 @@
         android:textSize="20sp"
         android:layout_marginBottom="20dp"
         android:textAlignment="textStart"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/alarm_button"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -55,6 +56,7 @@
         android:textAlignment="textEnd"
         android:textSize="20sp"
         android:layout_marginEnd="10dp"
+        android:visibility="gone"
         android:layout_marginBottom="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/alarm_button" />
@@ -70,14 +72,14 @@
         style="@style/Widget.AppCompat.Button.Colored"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="#FFFFFF"
-        android:layout_marginBottom="17dp"
+        android:layout_marginBottom="15dp"
         android:text="@string/finishWalk"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
         android:id="@+id/back"
-        android:layout_width="125dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:visibility="gone"
@@ -93,7 +95,7 @@
 
     <Button
         android:id="@+id/start_walk"
-        android:layout_width="125dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
         android:visibility="gone"
@@ -115,6 +117,7 @@
         android:textSize="18sp"
         android:visibility="gone"
         android:layout_marginBottom="25dp"
+        android:layout_marginStart="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:theme="@style/WWSwitch"
@@ -128,9 +131,9 @@
         android:layout_marginTop="10dp"
         android:textColor="#F44336"
         android:textSize="18sp"
-        android:layout_marginBottom="25dp"
+        android:layout_marginBottom="20dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/alarm_button"
         android:theme="@style/WWSwitch"
         android:layout_marginStart="10dp"
         android:layout_centerHorizontal="true"
@@ -143,16 +146,16 @@
         android:layout_marginTop="10dp"
         android:textColor="#F44336"
         android:textSize="18sp"
-        android:layout_marginBottom="25dp"
+        android:layout_marginBottom="20dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/alarm_button"
         android:theme="@style/WWSwitch"
         android:layout_marginEnd="10dp"
         android:text="@string/safeWalk" />
 
     <Button
         android:id="@+id/alarm_button"
-        android:layout_width="125dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="15dp"
         android:text="@string/alarm"
