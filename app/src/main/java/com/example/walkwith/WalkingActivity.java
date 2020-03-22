@@ -376,7 +376,11 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
             String result = (String) obj.get("result");
             Log.d("test", result);
 
-            if (!result.equals("True")) {
+            if (result.equals("True-But No Safe Route"))
+                Toast.makeText(this, "No safer route found",
+                        Toast.LENGTH_SHORT).show();
+
+            else if (!result.equals("True")) {
                 Toast.makeText(this, "Couldn't determine route. Try again later.",
                         Toast.LENGTH_SHORT).show();
                 return;
