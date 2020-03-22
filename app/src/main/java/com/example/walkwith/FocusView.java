@@ -2,18 +2,24 @@ package com.example.walkwith;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,6 +51,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -55,16 +62,19 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
     private GoogleMap mMap;
     private Polyline line;
     private PolylineOptions route;
-    private LatLng friendLocation;
+    private LocationManager mLocationManager;
+    private LatLng friendLocation, currentLocation;
     private Double latitude, longitude, LATLONG_DEFAULT = 0d;
     private Float zoom, ZOOM_DEFAULT = 15f;
+    private ArrayList<Marker> friendMarkers = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_focus_view);
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         zoom = getIntent().getFloatExtra("cameraZoom", ZOOM_DEFAULT);
         latitude = getIntent().getDoubleExtra("cameraLat", LATLONG_DEFAULT);
         longitude = getIntent().getDoubleExtra("cameraLong", LATLONG_DEFAULT);
@@ -95,6 +105,7 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
 
     public void onMapReady(GoogleMap map){
         mMap = map;
+        getLastBestLocation();
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
@@ -104,13 +115,17 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
             LatLng latLng = new LatLng(latitude, longitude);
             CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
                     latLng, zoom);
-            mMap.animateCamera(location);
+            mMap.moveCamera(location);
         }
-        else
+        else {
             Toast.makeText(getApplicationContext(), "Map consistency error",
                     Toast.LENGTH_SHORT).show();
-
-
+            if (currentLocation != null) {
+                CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
+                        currentLocation, 15f);
+                mMap.moveCamera(location);
+            }
+        }
     }
 
     private void updateViewPOST(String email) { // TODO Make this a general function
@@ -122,6 +137,7 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
             jsonBody.put("email", email);
 
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+                @RequiresApi(api = Build.VERSION_CODES.O)
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
@@ -209,23 +225,69 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         }
     }
 
-    private void displayTrustedContactLoc(String[] emails, ArrayList<Double> lats, ArrayList<Double>
-            longs, String[] lastUpdated){
+    private void getLastBestLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.
+                ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.
+                        ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+            return;
+        Location locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location locationNet = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+        long GPSLocationTime = 0;
+        if (null != locationGPS)
+            GPSLocationTime = locationGPS.getTime();
+
+        long NetLocationTime = 0;
+
+        if (null != locationNet)
+            NetLocationTime = locationNet.getTime();
+
+        if ( 0 < GPSLocationTime - NetLocationTime )
+            currentLocation = new LatLng(locationGPS.getLatitude(), locationGPS.getLongitude());
+        else
+            currentLocation = new LatLng(locationNet.getLatitude(), locationNet.getLongitude());
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void displayTrustedContactLoc(
+            String[] emails, ArrayList<Double> lats, ArrayList<Double> longs, String[] lastUpdated) {
         Marker mFriend;
 
-        if (mMap == null)
-            return;
-        for(int i = 0; i < emails.length; i++){
-            Log.e("mytag","" + i + ": " + emails[i] + "," + lats.get(i) + "," + longs.get(i) + "," + lastUpdated[i]);
+        // Remove all the old ones first
+        if (friendMarkers.size() > 0) {
+            for (Marker m : friendMarkers)
+                m.remove();
+            friendMarkers.clear();
+        }
+
+        for (int i = 0; i < emails.length; i++) {
+            Log.e("mytag", "" + i + ": " + emails[i] + "," + longs.get(i) + "," + lats.get(i) + "," + lastUpdated[i]);
+            String oldLast = lastUpdated[i];
+            String last = oldLast.substring(0,10)+'T'+oldLast.substring(11);
+            int drawable;
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O)
+                drawable = R.drawable.active_icon;
+            else {
+                LocalDateTime lastOnDate = LocalDateTime.parse(last);
+                LocalDateTime minsAgo = LocalDateTime.now().minusMinutes(1);
+                if (minsAgo.compareTo(lastOnDate) > 0)
+                    drawable = R.drawable.offline_icon;
+                else
+                    drawable = R.drawable.active_icon;
+            }
+
             mFriend = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(longs.get(i), lats.get(i)))
-                    .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(R.drawable.active_icon, "" + emails[i])))
-                    .anchor(0.5f,1)
+                    .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(drawable, "" + emails[i])))
+                    .title(emails[i])
+                    .anchor(0.5f, 1)
             );
-            mFriend.setTag(i);
+            friendMarkers.add(mFriend);
             if (emails[i].equals(AccountInfo.getFriendFocusedOn())) {
-                moveToCurrentLocation(lats.get(i), longs.get(i));
+                moveToCurrentLocation(longs.get(i), lats.get(i));
             }
+            mFriend.setTag(1);
         }
     }
 
@@ -239,7 +301,7 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         customMarkerView.buildDrawingCache();
 
         TextView customTextView = (TextView) customMarkerView.findViewById(R.id.text_view);
-        customTextView.setText(username);
+        customTextView.setText(String.valueOf(username.toUpperCase().charAt(0)));
 
         Bitmap returnedBitmap = Bitmap.createBitmap(customMarkerView.getMeasuredWidth(), customMarkerView.getMeasuredHeight(),
                 Bitmap.Config.ARGB_8888);
@@ -256,12 +318,7 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
     private void moveToCurrentLocation(double lats, double longs )
     {
         LatLng currentLocation =  new LatLng(lats, longs);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation,15));
-        // Zoom in, animating the camera.
-        mMap.animateCamera(CameraUpdateFactory.zoomIn());
-        // Zoom out to zoom level 10, animating with a duration of 2 seconds.
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
-
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation,15f));
     }
 
     public void sendGetFriendRoutePOST(String email,String friendEmail) {
