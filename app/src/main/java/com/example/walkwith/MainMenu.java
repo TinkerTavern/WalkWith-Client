@@ -2,6 +2,7 @@ package com.example.walkwith;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -186,6 +187,10 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_LOCATION_REQUEST_CODE);
         }
+        if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.O)
+            Toast.makeText(this, "Can't check online status before android Oreo, " +
+                            "showing online...",
+                    Toast.LENGTH_SHORT).show();
 
         mMap.setOnMarkerClickListener(this);
 
@@ -292,6 +297,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
             jsonBody.put("email", email);
 
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+                @RequiresApi(api = Build.VERSION_CODES.O)
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
@@ -330,6 +336,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         return doubleList;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void displayTrustedContactLoc(
             String[] emails, ArrayList<Double> lats, ArrayList<Double> longs, String[] lastUpdated) {
         Marker mFriend;
@@ -344,13 +351,18 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
             Log.e("mytag", "" + i + ": " + emails[i] + "," + longs.get(i) + "," + lats.get(i) + "," + lastUpdated[i]);
             String oldLast = lastUpdated[i];
             String last = oldLast.substring(0,10)+'T'+oldLast.substring(11);
-            LocalDateTime lastOnDate = LocalDateTime.parse(last);
-            LocalDateTime minsAgo = LocalDateTime.now().minusMinutes(1);
             int drawable;
-            if (minsAgo.compareTo(lastOnDate) > 0)
-                drawable = R.drawable.offline_icon;
-            else
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O)
                 drawable = R.drawable.active_icon;
+            else {
+                LocalDateTime lastOnDate = LocalDateTime.parse(last);
+                LocalDateTime minsAgo = LocalDateTime.now().minusMinutes(1);
+                if (minsAgo.compareTo(lastOnDate) > 0)
+                    drawable = R.drawable.offline_icon;
+                else
+                    drawable = R.drawable.active_icon;
+            }
+
             mFriend = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(longs.get(i), lats.get(i)))
                     .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(drawable, "" + emails[i])))
@@ -372,7 +384,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         customMarkerView.buildDrawingCache();
 
         TextView customTextView = (TextView) customMarkerView.findViewById(R.id.text_view);
-        customTextView.setText(username);
+        customTextView.setText(String.valueOf(username.toUpperCase().charAt(0)));
 
         Bitmap returnedBitmap = Bitmap.createBitmap(customMarkerView.getMeasuredWidth(), customMarkerView.getMeasuredHeight(),
                 Bitmap.Config.ARGB_8888);

@@ -1,6 +1,7 @@
 package com.example.walkwith;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -17,6 +18,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -86,6 +88,7 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
     3 - Both
      */
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -291,14 +294,18 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
     }
 
     private void setupCamera() {
-        try {
-            camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-            cameraId = camManager.getCameraIdList()[0]; // Usually front camera is at 0 position.
-            cameraWorking = true;
-        }
-        catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "Can't access camera for flash",
-                    Toast.LENGTH_SHORT).show();
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M)
+            Toast.makeText(this, "Torch can't be accessed before android " +
+                    "Marshmallow", Toast.LENGTH_SHORT);
+        else {
+            try {
+                camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+                cameraId = camManager.getCameraIdList()[0]; // Usually front camera is at 0 position.
+                cameraWorking = true;
+            } catch (Exception e) {
+                Toast.makeText(getApplicationContext(), "Can't access camera for flash",
+                        Toast.LENGTH_SHORT).show();
+            }
         }
         torch.setClickable(cameraWorking);
     }
