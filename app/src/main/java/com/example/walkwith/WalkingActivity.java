@@ -323,10 +323,11 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
         mMap.setOnMyLocationClickListener(this);
         View locationButton = ((View) findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
         RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
-        // position on right bottom
-        rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
-        rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-        rlp.setMargins(0, 260, 180, 0);
+        View view = findViewById(R.id.searchView);
+        int[] loc = {0,0};
+        locationButton.getLocationOnScreen(loc);
+        int absoluteBottom = loc[1] + view.getHeight();
+        rlp.setMargins(0, absoluteBottom, 5, 0);
         if (!zoom.equals(ZOOM_DEFAULT) && !latitude.equals(LATLONG_DEFAULT) &&
                 !longitude.equals(LATLONG_DEFAULT)) {
             LatLng latLng = new LatLng(latitude, longitude);
