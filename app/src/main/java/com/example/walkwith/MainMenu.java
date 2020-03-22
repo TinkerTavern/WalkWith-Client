@@ -345,7 +345,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
             String oldLast = lastUpdated[i];
             String last = oldLast.substring(0,10)+'T'+oldLast.substring(11);
             LocalDateTime lastOnDate = LocalDateTime.parse(last);
-            LocalDateTime minsAgo = LocalDateTime.now().minusMinutes(5);
+            LocalDateTime minsAgo = LocalDateTime.now().minusMinutes(1);
             int drawable;
             if (minsAgo.compareTo(lastOnDate) > 0)
                 drawable = R.drawable.offline_icon;
