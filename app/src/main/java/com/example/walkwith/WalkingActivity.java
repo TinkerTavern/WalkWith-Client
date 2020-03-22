@@ -72,7 +72,6 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
     private String email, cameraId;
     private Polyline line;
     private PolylineOptions route;
-    private Location currentBestLocation = null;
     private LocationManager mLocationManager;
     private List<LatLng> points;
     private CameraManager camManager;
@@ -321,6 +320,7 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
+        getLastBestLocation();
         View locationButton = ((View) findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
         RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
         View view = findViewById(R.id.searchView);
@@ -328,16 +328,23 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
         locationButton.getLocationOnScreen(loc);
         int absoluteBottom = loc[1] + view.getHeight();
         rlp.setMargins(0, absoluteBottom, 5, 0);
+
         if (!zoom.equals(ZOOM_DEFAULT) && !latitude.equals(LATLONG_DEFAULT) &&
                 !longitude.equals(LATLONG_DEFAULT)) {
             LatLng latLng = new LatLng(latitude, longitude);
             CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
                     latLng, zoom);
-            mMap.animateCamera(location);
+            mMap.moveCamera(location);
         }
-        else
+        else {
             Toast.makeText(getApplicationContext(), "Map consistency error",
                     Toast.LENGTH_SHORT).show();
+            if (currentLocation != null) {
+                CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
+                        currentLocation, 15f);
+                mMap.moveCamera(location);
+            }
+        }
     }
 
     private String determineMode() {
@@ -587,49 +594,13 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
         });
         builder.show();
     }
-    public void enableLocationThings() {
-        mMap.setMyLocationEnabled(true);
-        mMap.setOnMyLocationButtonClickListener(this);
-        mMap.setOnMyLocationClickListener(this);
-        //TODO: Make it zoom to current location
-    }
-
-    private void checkIfLocationOn() {
-        if (isLocationEnabled(getApplicationContext()))
-            enableLocationThings();
-        else {
-            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
-                    .setCancelable(false)
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        public void onClick(final DialogInterface dialog, final int id) {
-                            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                            if (isLocationEnabled(getApplicationContext()))
-                                enableLocationThings();
-                        }
-                    })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        public void onClick(final DialogInterface dialog, final int id) {
-                            dialog.cancel();
-                        }
-                    });
-            final AlertDialog alert = builder.create();
-            alert.show();
-        }
-    }
 
     private void getLastBestLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.
                 ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.
-                        ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+                        ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             return;
-        }
         Location locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         Location locationNet = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
@@ -644,8 +615,14 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
 
         if ( 0 < GPSLocationTime - NetLocationTime )
             currentLocation = new LatLng(locationGPS.getLatitude(), locationGPS.getLongitude());
-        else
-            currentLocation = new LatLng(locationNet.getLatitude(), locationNet.getLongitude());
+        else {
+            try {
+                currentLocation = new LatLng(locationNet.getLatitude(), locationNet.getLongitude());
+            }
+            catch (NullPointerException e) {
+                Toast.makeText(this, "Location error", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override

@@ -39,6 +39,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import com.example.walkwith.utils.Utilities;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -65,6 +67,8 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
     private GoogleMap mMap;
     private int MY_LOCATION_REQUEST_CODE = 1;
     private ArrayList<Marker> friendMarkers = new ArrayList<>();
+    private LatLng currentLocation;
+    private LocationManager mLocationManager;
 
 
     Polyline route;
@@ -74,7 +78,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
-
+        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -178,6 +182,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         startThread();
+        getLastBestLocation();
         // Get users last location to show on map
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED)
@@ -191,9 +196,37 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
             Toast.makeText(this, "Can't check online status before android Oreo, " +
                             "showing online...",
                     Toast.LENGTH_SHORT).show();
+        if (currentLocation != null) {
+            CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
+                    currentLocation, 15f);
+            mMap.animateCamera(location);
+        }
 
         mMap.setOnMarkerClickListener(this);
+    }
 
+    private void getLastBestLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.
+                ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.
+                        ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+            return;
+        Location locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location locationNet = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+        long GPSLocationTime = 0;
+        if (null != locationGPS)
+            GPSLocationTime = locationGPS.getTime();
+
+        long NetLocationTime = 0;
+
+        if (null != locationNet)
+            NetLocationTime = locationNet.getTime();
+
+        if ( 0 < GPSLocationTime - NetLocationTime )
+            currentLocation = new LatLng(locationGPS.getLatitude(), locationGPS.getLongitude());
+        else
+            currentLocation = new LatLng(locationNet.getLatitude(), locationNet.getLongitude());
     }
 
     @Override
