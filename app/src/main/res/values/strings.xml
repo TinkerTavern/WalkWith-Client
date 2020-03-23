@@ -69,5 +69,7 @@
     <string name="cancel">Cancel</string>
     <string name="confirmChanges">Confirm Changes</string>
     <string name="newPass">New Password</string>
+    <string name="watching">You are watching: %1$s</string>
+    <string name="stopFocus">Stop Focus</string>
 
 </resources>
