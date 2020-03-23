@@ -16,18 +16,24 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     private List<String> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
+    private int mode;
 
     //data is passed to constructor
-    MyRecyclerViewAdapter(Context context, List<String> data){
+    MyRecyclerViewAdapter(Context context, List<String> data, int option){
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
+        mode = option;
     }
 
     //inflates the row layout from xml when needed
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.recyclerview_row, parent, false);
+        View view;
+        if (mode == 1)
+            view = mInflater.inflate(R.layout.recyclerview_row, parent, false);
+        else
+            view = mInflater.inflate(R.layout.recyclerview_column, parent, false);
         return new ViewHolder(view);
     }
 
