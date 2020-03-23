@@ -69,12 +69,6 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
-    /*
-    Light - MODE_NIGHT_NO
-    Dark - MODE_NIGHT_YES
-    Set by Battery Saver - MODE_NIGHT_AUTO_BATTERY
-    System default - MODE_NIGHT_FOLLOW_SYSTEM
-     */
 
     private void switchTheme() {
         String[] opts = {"Light", "Dark", ""}; // 3rd is determined by android version

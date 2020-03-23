@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -77,14 +78,35 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
     Thread trustThread;
 
     @Override
+    public void onResume(){
+        super.onResume();
+        // put your code here...
+        SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
+        String theme = preferences.getString("theme","");
+        if (!theme.equals(""))
+            parseTheme(Integer.parseInt(theme));
+    }
+
+    private void parseTheme(int theme) {
+        ConstraintLayout someView = findViewById(R.id.mainMenuConstraint);
+        switch (theme) {
+            case AppCompatDelegate.MODE_NIGHT_NO:
+                someView.setBackgroundColor(ContextCompat.getColor(this, R.color.light));
+                break;
+            case AppCompatDelegate.MODE_NIGHT_YES:
+                someView.setBackgroundColor(ContextCompat.getColor(this, R.color.dark));
+                break;
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
         SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
         String theme = preferences.getString("theme","");
         if (!theme.equals(""))
-            AppCompatDelegate.setDefaultNightMode(Integer.parseInt(theme));
-        Toast.makeText(this, theme, Toast.LENGTH_SHORT).show();
+            parseTheme(Integer.parseInt(theme));
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()

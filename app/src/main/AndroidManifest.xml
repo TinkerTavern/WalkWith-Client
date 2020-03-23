@@ -18,7 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".EditProfileActivity"></activity>
+        <activity android:name=".EditProfileActivity"/>
         <activity
             android:name=".ForgotPasswordActivity"
             android:label="@string/forgotten_password" />
@@ -32,7 +32,8 @@
                 android:value="com.example.walkwith.LoginActivity" />
         </activity>
         <activity android:name=".ContactInfo" />
-        <activity android:name=".TrustedContactList" />
+        <activity android:name=".TrustedContactList"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".AlarmActivity"
             android:label="@string/title_activity_alarm"

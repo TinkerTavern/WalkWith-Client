@@ -1,6 +1,7 @@
 package com.example.walkwith;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,6 +40,9 @@ public class TrustedContactList extends AppCompatActivity implements MyRecyclerV
         setContentView(R.layout.activity_trusted_contact_list);
 
         Button addTC = findViewById(R.id.addTCButton);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("Trusted Contacts");
+        setSupportActionBar(toolbar);
 
         addTC.setOnClickListener(new View.OnClickListener(){
 

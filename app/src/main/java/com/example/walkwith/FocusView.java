@@ -4,7 +4,9 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -103,6 +105,18 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         }
     }
 
+    private void parseTheme(int theme) {
+        ConstraintLayout someView = findViewById(R.id.focusConstraint);
+        switch (theme) {
+            case AppCompatDelegate.MODE_NIGHT_NO:
+                someView.setBackgroundColor(ContextCompat.getColor(this, R.color.light));
+                break;
+            case AppCompatDelegate.MODE_NIGHT_YES:
+                someView.setBackgroundColor(ContextCompat.getColor(this, R.color.dark));
+                break;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,8 +124,7 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
         String theme = preferences.getString("theme","");
         if (!theme.equals(""))
-            AppCompatDelegate.setDefaultNightMode(Integer.parseInt(theme));
-        Toast.makeText(this, theme, Toast.LENGTH_SHORT).show();
+            parseTheme(Integer.parseInt(theme));
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getContactsTrusted();
         recyclerView = findViewById(R.id.friendList);
