@@ -14,10 +14,13 @@ import com.example.walkwith.utils.Utilities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -63,6 +66,17 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
             }
             editor.apply();
+        });
+
+        passwordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEND) {
+                    sendAccountPOST("login", usernameEditText.getText().toString(),
+                            passwordEditText.getText().toString());
+                    return true;
+                }
+                return false;
+            }
         });
 
         loginButton.setOnClickListener(new View.OnClickListener() {

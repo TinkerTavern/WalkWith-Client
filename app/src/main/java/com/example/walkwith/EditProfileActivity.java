@@ -131,13 +131,14 @@ public class EditProfileActivity extends AppCompatActivity {
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    setupInfo(response);
+                    Toast.makeText(getApplicationContext(), "Details changed successfully",
+                            Toast.LENGTH_SHORT).show();
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     // put the error here
-                    Toast.makeText(getApplicationContext(), "Error in updating info", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
             // Add the request to the RequestQueue.
@@ -193,7 +194,7 @@ public class EditProfileActivity extends AppCompatActivity {
         try {
             String result = (String) response.get("result");
             if (!result.equals("True"))
-                Toast.makeText(getApplicationContext(), "Error in getting user info",
+                Toast.makeText(getApplicationContext(), result,
                         Toast.LENGTH_SHORT).show();
             else {
                 email.setText((String) response.get("email"));
@@ -203,7 +204,7 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         }
         catch (JSONException e) {
-            Toast.makeText(getApplicationContext(), "Error in getting user info",
+            Toast.makeText(getApplicationContext(), e.getMessage(),
                     Toast.LENGTH_SHORT).show();
 
         }
