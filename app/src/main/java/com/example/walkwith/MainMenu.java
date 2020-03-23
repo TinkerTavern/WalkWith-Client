@@ -12,6 +12,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -151,6 +152,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         viewWalkers.putExtra("cameraLat", position.target.latitude);
         viewWalkers.putExtra("cameraLong", position.target.longitude);
         viewWalkers.putExtra("cameraZoom", position.zoom);
+        viewWalkers.putExtra("isActive", "True");
         startActivity(viewWalkers);
     }
 
@@ -223,10 +225,15 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         if (null != locationNet)
             NetLocationTime = locationNet.getTime();
 
-        if ( 0 < GPSLocationTime - NetLocationTime )
-            currentLocation = new LatLng(locationGPS.getLatitude(), locationGPS.getLongitude());
-        else
-            currentLocation = new LatLng(locationNet.getLatitude(), locationNet.getLongitude());
+        try {
+            if (0 < GPSLocationTime - NetLocationTime)
+                currentLocation = new LatLng(locationGPS.getLatitude(), locationGPS.getLongitude());
+            else
+                currentLocation = new LatLng(locationNet.getLatitude(), locationNet.getLongitude());
+        }
+        catch (NullPointerException e) {
+            Toast.makeText(this, "Error in getting location", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -327,6 +334,15 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         try {
             JSONObject jsonBody = new JSONObject();
 
+            if (email == null) {
+                SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
+                String newEmail = preferences.getString("email", "");
+                if (!newEmail.equals(""))
+                    email = newEmail;
+                else {
+                    Toast.makeText(this, "lost email?", Toast.LENGTH_SHORT).show();
+                }
+            }
             jsonBody.put("email", email);
 
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {

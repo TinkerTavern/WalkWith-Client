@@ -11,6 +11,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -66,6 +67,7 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
     private LatLng friendLocation, currentLocation;
     private Double latitude, longitude, LATLONG_DEFAULT = 0d;
     private Float zoom, ZOOM_DEFAULT = 15f;
+    private boolean isActive = false;
     private ArrayList<Marker> friendMarkers = new ArrayList<>();
 
 
@@ -76,6 +78,9 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         zoom = getIntent().getFloatExtra("cameraZoom", ZOOM_DEFAULT);
+        String active = getIntent().getStringExtra("isActive");
+        if (active != null && active.equals("True"))
+            isActive = true;
         latitude = getIntent().getDoubleExtra("cameraLat", LATLONG_DEFAULT);
         longitude = getIntent().getDoubleExtra("cameraLong", LATLONG_DEFAULT);
         SupportMapFragment mapFragment =
@@ -134,6 +139,15 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         try {
             JSONObject jsonBody = new JSONObject();
 
+            if (email == null) {
+                SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
+                String newEmail = preferences.getString("email", "");
+                if (!newEmail.equals(""))
+                    email = newEmail;
+                else {
+                    Toast.makeText(this, "lost email?", Toast.LENGTH_SHORT).show();
+                }
+            }
             jsonBody.put("email", email);
 
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
@@ -340,7 +354,6 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    // put the error here
                 }
             });
             // Add the request to the RequestQueue.
@@ -348,13 +361,13 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
 
         } catch (
                 JSONException e) {
-            e.printStackTrace();
         }
     }
 
     private void showRoute(JSONObject response){
         try {
             String encodedRoute = (String) response.get("route");
+            Log.e("Agg", encodedRoute);
 
             List<LatLng> points = decodePolyLine(encodedRoute);
             route = new PolylineOptions().

@@ -10,6 +10,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.camera2.CameraAccessException;
@@ -110,6 +111,15 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
         }
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         email = AccountInfo.getEmail();
+        if (email == null) {
+            SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
+            String newEmail = preferences.getString("email", "");
+            if (!newEmail.equals(""))
+                email = newEmail;
+            else {
+                Toast.makeText(this, "lost email?", Toast.LENGTH_SHORT).show();
+            }
+        }
         active = false;
         onRoute = false;
         route = new PolylineOptions().
@@ -620,7 +630,8 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
                 currentLocation = new LatLng(locationNet.getLatitude(), locationNet.getLongitude());
             }
             catch (NullPointerException e) {
-                Toast.makeText(this, "Location error", Toast.LENGTH_SHORT).show();
+                Log.e("Error", "Oof");
+//                Toast.makeText(this, "Location error", Toast.LENGTH_SHORT).show();
             }
         }
     }
