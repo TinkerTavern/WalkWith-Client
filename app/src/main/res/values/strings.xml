@@ -68,5 +68,6 @@
     <string name="star">********</string>
     <string name="cancel">Cancel</string>
     <string name="confirmChanges">Confirm Changes</string>
+    <string name="newPass">New Password</string>
 
 </resources>

@@ -107,7 +107,7 @@ public class EditProfileActivity extends AppCompatActivity {
             JSONObject jsonBody = new JSONObject();
 
             String userEmail = AccountInfo.getEmail();
-            String mode = "EditInfo";
+
             if (userEmail == null) {
                 SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
                 String newEmail = preferences.getString("email", "");
@@ -118,6 +118,15 @@ public class EditProfileActivity extends AppCompatActivity {
                 }
             }
             jsonBody.put("email", userEmail);
+            jsonBody.put("mode", "updateInfo");
+            jsonBody.put("password", password.getText().toString());
+            if (confirmPassword.getText().toString().length() > 0 && !confirmPassword.getText().toString().equals(password.getText().toString()))
+                jsonBody.put("newPass", confirmPassword.getText().toString());
+            else
+                jsonBody.put("newPass", password.getText().toString());
+            jsonBody.put("firstName", forename.getText().toString());
+            jsonBody.put("lastName", surname.getText().toString());
+            jsonBody.put("phoneNum", phone.getText().toString());
 
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
                 @Override
@@ -128,7 +137,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     // put the error here
-                    Toast.makeText(getApplicationContext(), "Routing issues", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Error in updating info", Toast.LENGTH_SHORT).show();
                 }
             });
             // Add the request to the RequestQueue.
