@@ -1,6 +1,18 @@
 package com.example.walkwith;
 
+import android.content.Context;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.walkwith.utils.Utilities;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -8,6 +20,7 @@ public class AccountInfo {
     private static String username;
     private static String email;
     private static ArrayList<String> friendsList;
+    private static ArrayList<String> contactsTrusted;
     private static String friendFocusedOn;
 
     public AccountInfo(/*String username,*/ String email){
@@ -19,6 +32,54 @@ public class AccountInfo {
         if (AccountInfo.friendsList != null)
             AccountInfo.friendsList.clear();
         AccountInfo.friendsList = Utilities.listToArrayList(emails);
+    }
+
+    public static void setContactsTrusted(String[] emails) {
+        if (emails.length == 0)
+            return;
+        if (AccountInfo.contactsTrusted != null)
+            AccountInfo.contactsTrusted.clear();
+        AccountInfo.contactsTrusted = Utilities.listToArrayList(emails);
+    }
+
+    public static ArrayList<String> getContactsTrusted() {
+        return contactsTrusted;
+    }
+
+    public static String[] updateContactsTrusted(Context parentContext) {
+        RequestQueue queue = Volley.newRequestQueue((parentContext));
+        String url = parentContext.getResources().getString(R.string.server_ip) + "getContactsTrusted";
+        try {
+            JSONObject jsonBody = new JSONObject();
+
+            jsonBody.put("email", AccountInfo.getEmail());
+
+            JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                String[] emails = Utilities.jsonArrayToList((JSONArray)
+                                        response.get("emails")).toArray(new String[0]);
+                                AccountInfo.setContactsTrusted(emails);
+                            }
+                            catch (JSONException e) {
+                                e.getMessage();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    error.getMessage();
+                }
+            });
+            queue.add(jsonObject);
+
+        } catch (
+                JSONException e) {
+            e.printStackTrace();
+        }
+        return new String[] {};
     }
 
 
