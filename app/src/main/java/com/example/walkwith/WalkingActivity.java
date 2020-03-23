@@ -372,7 +372,7 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
 
         try {
             JSONObject jsonBody = new JSONObject();
-
+            Log.e("kk", email);
             jsonBody.put("email", email);
             jsonBody.put("mode", determineMode());
             jsonBody.put("aLong", aLon);
@@ -538,18 +538,18 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
                                 askToStop();
                         }
                         else {
-                            Toast.makeText(getApplicationContext(), "Maps Error.",
+                            Toast.makeText(getApplicationContext(), result,
                                     Toast.LENGTH_SHORT).show();
                         }
                     } catch (JSONException e) {
-                        Toast.makeText(getApplicationContext(), "Routing error.",
+                        Toast.makeText(getApplicationContext(), e.getMessage(),
                                 Toast.LENGTH_SHORT).show();
                     }
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(getApplicationContext(), "Routing error.",
+                    Toast.makeText(getApplicationContext(), error.getMessage(),
                             Toast.LENGTH_SHORT).show();
                 }
             });
@@ -558,7 +558,7 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
 
         } catch (
                 JSONException e) {
-            Toast.makeText(getApplicationContext(), "Routing error.",
+            Toast.makeText(getApplicationContext(), e.getMessage(),
                     Toast.LENGTH_SHORT).show();
         }
     }
