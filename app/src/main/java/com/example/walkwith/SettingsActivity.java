@@ -32,6 +32,12 @@ public class SettingsActivity extends AppCompatActivity {
 
         final Button logOutButton = findViewById(R.id.logOut);
         final Button deleteAccountButton = findViewById(R.id.deleteAccount);
+        Button viewAcc = findViewById(R.id.viewProfile);
+
+        viewAcc.setOnClickListener(v -> {
+            Intent myIntent = new Intent(this, EditProfileActivity.class);
+            this.startActivity(myIntent);
+        });
 
         logOutButton.setOnClickListener(v -> {
             SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);

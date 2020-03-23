@@ -59,10 +59,14 @@
     <string name="confirm_email">Confirm Email</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="title_activity_forgot_password">ForgotPasswordActivity</string>
-
+    <string name="deleteAccount">Delete Account</string>
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="change_password">Change Password</string>
     <string name="phone_number">Phone Number</string>
+    <string name="editProfile">Edit Profile</string>
+    <string name="star">********</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirmChanges">Confirm Changes</string>
 
 </resources>
