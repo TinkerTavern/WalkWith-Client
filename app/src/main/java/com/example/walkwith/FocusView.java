@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -25,6 +27,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,28 +62,69 @@ import java.util.Objects;
 
 import static com.example.walkwith.MainMenu.isLocationEnabled;
 
-public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener, OnMapReadyCallback {
+public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocationClickListener,
+        GoogleMap.OnMyLocationButtonClickListener, OnMapReadyCallback,
+        MyRecyclerViewAdapter.ItemClickListener{
     private GoogleMap mMap;
     private Polyline line;
+    private boolean ready = false, firstTime = true;
     private PolylineOptions route;
     private LocationManager mLocationManager;
     private LatLng friendLocation, currentLocation;
     private Double latitude, longitude, LATLONG_DEFAULT = 0d;
     private Float zoom, ZOOM_DEFAULT = 15f;
     private boolean isActive = false;
+    ArrayList<String> trustedContactNames = new ArrayList<>();
     private ArrayList<Marker> friendMarkers = new ArrayList<>();
+    MyRecyclerViewAdapter adapter;
+    RecyclerView recyclerView;
+    private TextView focusFriend;
+    private Button cancelFocus;
 
+    private void changeActive(boolean status) {
+        isActive = status;
+        if (isActive) {
+            recyclerView.setVisibility(View.VISIBLE);
+            cancelFocus.setVisibility(View.GONE);
+            focusFriend.setVisibility(View.GONE);
+        }
+        else {
+            recyclerView.setVisibility(View.GONE);
+            cancelFocus.setVisibility(View.VISIBLE);
+            focusFriend.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void getContactsTrusted() {
+        trustedContactNames.addAll(AccountInfo.getContactsTrusted());
+        for (String name: trustedContactNames) {
+            Log.e("AAA", name);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_focus_view);
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getContactsTrusted();
+        recyclerView = findViewById(R.id.friendList);
+        adapter = new MyRecyclerViewAdapter(this, trustedContactNames, 0);
+        adapter.setClickListener(this);
+        recyclerView.setAdapter(adapter);
+        cancelFocus = findViewById(R.id.stopFocus);
+        focusFriend = findViewById(R.id.watching);
+        cancelFocus.setOnClickListener(v -> {
+            changeActive(true);
+            AccountInfo.setFriendFocusedOn("");
+        });
+
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         zoom = getIntent().getFloatExtra("cameraZoom", ZOOM_DEFAULT);
         String active = getIntent().getStringExtra("isActive");
-        if (active != null && active.equals("True"))
-            isActive = true;
+        if (active != null && active.equals("True")) {
+            changeActive(true);
+        }
         latitude = getIntent().getDoubleExtra("cameraLat", LATLONG_DEFAULT);
         longitude = getIntent().getDoubleExtra("cameraLong", LATLONG_DEFAULT);
         SupportMapFragment mapFragment =
@@ -95,10 +139,16 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         Thread trustThread = new  Thread() {
             public void run() {
                 // do stuff
+                int sleepTime;
+                if (isActive)
+                    sleepTime = Integer.parseInt(getResources().getString(R.string.activeTimer));
+                else
+                    sleepTime = Integer.parseInt(getResources().getString(R.string.focusTimer));
                 while (true) {
-                    updateViewPOST(AccountInfo.getEmail());
+                    if (ready)
+                        updateViewPOST(AccountInfo.getEmail());
                     try {
-                        Thread.sleep(Integer.parseInt(getResources().getString(R.string.focusTimer)));
+                        Thread.sleep(sleepTime);
                     } catch (InterruptedException e) {
                         break;
                     }
@@ -110,11 +160,13 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
 
     public void onMapReady(GoogleMap map){
         mMap = map;
+        ready = true;
         getLastBestLocation();
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
-        sendGetFriendRoutePOST(AccountInfo.getEmail(),AccountInfo.getFriendFocusedOn());
+        if (AccountInfo.getFriendFocusedOn() != null)
+            sendGetFriendRoutePOST(AccountInfo.getEmail(),AccountInfo.getFriendFocusedOn());
         if (!zoom.equals(ZOOM_DEFAULT) && !latitude.equals(LATLONG_DEFAULT) &&
                 !longitude.equals(LATLONG_DEFAULT)) {
             LatLng latLng = new LatLng(latitude, longitude);
@@ -162,6 +214,7 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
                         String[] lastUpdates = Utilities.jsonArrayToList((JSONArray) response.get("lastUpdated")).toArray(new String[0]);
                         ArrayList<Double> longsList = convertToDouble(Longs);
                         ArrayList<Double> latsList = convertToDouble(Lats);
+                        Log.e("Hi", emails.length + "");
                         displayTrustedContactLoc(emails, latsList, longsList, lastUpdates); // TODO: Also get the route they are going on
                     } catch (JSONException e) {
                         e.getMessage();
@@ -267,6 +320,7 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
     private void displayTrustedContactLoc(
             String[] emails, ArrayList<Double> lats, ArrayList<Double> longs, String[] lastUpdated) {
         Marker mFriend;
+        int online = 0;
 
         // Remove all the old ones first
         if (friendMarkers.size() > 0) {
@@ -276,7 +330,7 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         }
 
         for (int i = 0; i < emails.length; i++) {
-            Log.e("mytag", "" + i + ": " + emails[i] + "," + longs.get(i) + "," + lats.get(i) + "," + lastUpdated[i]);
+            Log.e("fmytag", "" + i + ": " + emails[i] + "," + longs.get(i) + "," + lats.get(i) + "," + lastUpdated[i]);
             String oldLast = lastUpdated[i];
             String last = oldLast.substring(0,10)+'T'+oldLast.substring(11);
             int drawable;
@@ -287,8 +341,10 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
                 LocalDateTime minsAgo = LocalDateTime.now().minusMinutes(1);
                 if (minsAgo.compareTo(lastOnDate) > 0)
                     drawable = R.drawable.offline_icon;
-                else
+                else {
                     drawable = R.drawable.active_icon;
+                    online++;
+                }
             }
 
             mFriend = mMap.addMarker(new MarkerOptions()
@@ -298,16 +354,25 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
                     .anchor(0.5f, 1)
             );
             friendMarkers.add(mFriend);
-            if (emails[i].equals(AccountInfo.getFriendFocusedOn())) {
+            if (emails[i].equals(AccountInfo.getFriendFocusedOn()) && !isActive) {
                 moveToCurrentLocation(longs.get(i), lats.get(i));
             }
+
             mFriend.setTag(1);
         }
+        firstTime = false;
+    }
+
+    private void addTrustedContact(String email) {
+        trustedContactNames.add(0, email);
+        Log.e("Add", email);
+        adapter.notifyItemInserted(0);
     }
 
     private Bitmap getMarkerBitmapFromView(@DrawableRes int resId, String username) {
 
-        View customMarkerView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.profile_icon_view, null);
+        View customMarkerView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+                .inflate(R.layout.profile_icon_view, null);
         ImageView markerImageView = (ImageView) customMarkerView.findViewById(R.id.profile_image);
         markerImageView.setImageResource(resId);
         customMarkerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
@@ -344,6 +409,7 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
 
             jsonBody.put("email", email);
             jsonBody.put("friendEmail", friendEmail);
+            Log.e("hm", friendEmail);
             // Put your headers here
 
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
@@ -419,5 +485,15 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
         }
 
         return decoded;
+    }
+
+    @Override
+    public void onItemClick(View view, int position) {
+        AccountInfo.setFriendFocusedOn(trustedContactNames.get(position));
+        Toast.makeText(this, "Now focusing on: "+ trustedContactNames.get(position),
+                Toast.LENGTH_SHORT).show();
+        focusFriend.setText(getString(R.string.watching,
+                trustedContactNames.get(position)));
+        changeActive(false);
     }
 }

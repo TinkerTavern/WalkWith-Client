@@ -84,6 +84,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        AccountInfo.updateContactsTrusted(this);
 
         trustThread = new Thread() {
             public void run() {
@@ -310,6 +311,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        Log.e("k", marker.getTitle());
         if (Objects.equals(marker.getTag(), 1))
             AccountInfo.setFriendFocusedOn(marker.getTitle());
         Intent focusView = new Intent(this, FocusView.class);
@@ -414,7 +416,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
 
             mFriend = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(longs.get(i), lats.get(i)))
-                    .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(drawable, "" + emails[i])))
+                    .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView(drawable, emails[i])))
                     .title(emails[i])
                     .anchor(0.5f, 1)
             );

@@ -34,7 +34,7 @@ public class TrustedContactList extends AppCompatActivity implements MyRecyclerV
     int nameIndex;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) { //TODO: Ensure it tracks person when switching to focus
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trusted_contact_list);
 
@@ -53,7 +53,7 @@ public class TrustedContactList extends AppCompatActivity implements MyRecyclerV
 
         RecyclerView recyclerView = findViewById(R.id.TrustedContacts);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new MyRecyclerViewAdapter(this, trustedContactNames);
+        adapter = new MyRecyclerViewAdapter(this, trustedContactNames, 1);
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
 
