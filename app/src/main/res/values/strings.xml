@@ -71,5 +71,7 @@
     <string name="newPass">New Password</string>
     <string name="watching">You are watching: %1$s</string>
     <string name="stopFocus">Stop Focus</string>
+    <string name="logout">Log Out</string>
+    <string name="viewProfile">View Profile</string>
 
 </resources>

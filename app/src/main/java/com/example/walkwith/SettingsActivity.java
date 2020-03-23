@@ -9,6 +9,7 @@ import android.text.InputType;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,6 +34,11 @@ public class SettingsActivity extends AppCompatActivity {
         final Button logOutButton = findViewById(R.id.logOut);
         final Button deleteAccountButton = findViewById(R.id.deleteAccount);
         Button viewAcc = findViewById(R.id.viewProfile);
+        Switch darkMode = findViewById(R.id.darkMode);
+
+        darkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            toggleDarkMode(buttonView.isChecked());
+        });
 
         viewAcc.setOnClickListener(v -> {
             Intent myIntent = new Intent(this, EditProfileActivity.class);
@@ -56,6 +62,10 @@ public class SettingsActivity extends AppCompatActivity {
         deleteAccountButton.setOnClickListener(v -> {
             passwordPopup();
         });
+    }
+
+    private void toggleDarkMode(boolean status) {
+        
     }
 
     private void returnToLogin() {
