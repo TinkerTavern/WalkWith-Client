@@ -140,11 +140,11 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
             public void run() {
                 // do stuff
                 int sleepTime;
-                if (isActive)
-                    sleepTime = Integer.parseInt(getResources().getString(R.string.activeTimer));
-                else
-                    sleepTime = Integer.parseInt(getResources().getString(R.string.focusTimer));
                 while (true) {
+                    if (isActive)
+                        sleepTime = Integer.parseInt(getResources().getString(R.string.activeTimer));
+                    else
+                        sleepTime = Integer.parseInt(getResources().getString(R.string.focusTimer));
                     if (ready)
                         updateViewPOST(AccountInfo.getEmail());
                     try {
