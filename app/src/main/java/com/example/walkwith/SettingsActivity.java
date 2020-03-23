@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -31,13 +33,17 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_activity);
 
+        SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
+        String theme = preferences.getString("theme","");
+        if (!theme.equals(""))
+            AppCompatDelegate.setDefaultNightMode(Integer.parseInt(theme));
         final Button logOutButton = findViewById(R.id.logOut);
         final Button deleteAccountButton = findViewById(R.id.deleteAccount);
         Button viewAcc = findViewById(R.id.viewProfile);
-        Switch darkMode = findViewById(R.id.darkMode);
+        Button darkMode = findViewById(R.id.darkMode);
 
-        darkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            toggleDarkMode(buttonView.isChecked());
+        darkMode.setOnClickListener(v -> {
+            switchTheme();
         });
 
         viewAcc.setOnClickListener(v -> {
@@ -46,7 +52,6 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         logOutButton.setOnClickListener(v -> {
-            SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
             String isRemember = preferences.getString("remember","");
             Log.d("test", "here");
             if (isRemember.equals("true")) {
@@ -64,8 +69,48 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
-    private void toggleDarkMode(boolean status) {
-        
+    /*
+    Light - MODE_NIGHT_NO
+    Dark - MODE_NIGHT_YES
+    Set by Battery Saver - MODE_NIGHT_AUTO_BATTERY
+    System default - MODE_NIGHT_FOLLOW_SYSTEM
+     */
+
+    private void switchTheme() {
+        String[] opts = {"Light", "Dark", ""}; // 3rd is determined by android version
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q)
+            opts[2] = "System Default";
+        else
+            opts[2] = "Set By Battery Saver";
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Pick a color");
+        builder.setItems(opts, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                int mode = AppCompatDelegate.MODE_NIGHT_NO;
+                switch (which) {
+                    case 0:
+                        mode = AppCompatDelegate.MODE_NIGHT_NO;
+                        break;
+                    case 1:
+                        mode = AppCompatDelegate.MODE_NIGHT_YES;
+                        break;
+                    case 2:
+                        if (opts[2].equals("System Default"))
+                            mode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+                        else
+                            mode = AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY;
+                        break;
+                }
+                SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("theme", String.valueOf(mode));
+                editor.apply();
+                AppCompatDelegate.setDefaultNightMode(mode);
+            }
+        });
+        builder.show();
     }
 
     private void returnToLogin() {

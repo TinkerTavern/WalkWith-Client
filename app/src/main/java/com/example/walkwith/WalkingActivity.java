@@ -3,6 +3,7 @@ package com.example.walkwith;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
@@ -95,7 +96,10 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
         setContentView(R.layout.activity_walking);
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapView2);
-
+        SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
+        String theme = preferences.getString("theme","");
+        if (!theme.equals(""))
+            AppCompatDelegate.setDefaultNightMode(Integer.parseInt(theme));
         eta = findViewById(R.id.eta);
         distanceLeft = findViewById(R.id.distanceLeft);
         eta.setText(getString(R.string.eta, "-"));
@@ -112,7 +116,6 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         email = AccountInfo.getEmail();
         if (email == null) {
-            SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
             String newEmail = preferences.getString("email", "");
             if (!newEmail.equals(""))
                 email = newEmail;

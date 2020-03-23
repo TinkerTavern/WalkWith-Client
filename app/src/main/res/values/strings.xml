@@ -73,5 +73,6 @@
     <string name="stopFocus">Stop Focus</string>
     <string name="logout">Log Out</string>
     <string name="viewProfile">View Profile</string>
+    <string name="changeTheme">Change Theme</string>
 
 </resources>

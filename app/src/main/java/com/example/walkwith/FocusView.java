@@ -3,6 +3,7 @@ package com.example.walkwith;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -106,6 +107,11 @@ public class FocusView extends FragmentActivity implements GoogleMap.OnMyLocatio
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_focus_view);
+        SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
+        String theme = preferences.getString("theme","");
+        if (!theme.equals(""))
+            AppCompatDelegate.setDefaultNightMode(Integer.parseInt(theme));
+        Toast.makeText(this, theme, Toast.LENGTH_SHORT).show();
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getContactsTrusted();
         recyclerView = findViewById(R.id.friendList);

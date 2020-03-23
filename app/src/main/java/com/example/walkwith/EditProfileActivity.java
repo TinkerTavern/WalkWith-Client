@@ -1,6 +1,7 @@
 package com.example.walkwith;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -32,7 +33,10 @@ public class EditProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
-
+        SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
+        String theme = preferences.getString("theme","");
+        if (!theme.equals(""))
+            AppCompatDelegate.setDefaultNightMode(Integer.parseInt(theme));
         forename = findViewById(R.id.firstnameVal);
         surname = findViewById(R.id.surnameVal);
         email = findViewById(R.id.emailVal);

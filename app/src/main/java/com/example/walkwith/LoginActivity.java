@@ -13,6 +13,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.walkwith.utils.Utilities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import android.view.KeyEvent;
 import android.view.View;
@@ -45,8 +46,10 @@ public class LoginActivity extends AppCompatActivity {
         final Button createAccountButton = findViewById(R.id.createAccount);
         final Button forgotPasswordButton = findViewById(R.id.forgotPassword);
         final Switch rememberMe = findViewById(R.id.rememberMe);
-
         SharedPreferences preferences = getSharedPreferences("checkbox", MODE_PRIVATE);
+        String theme = preferences.getString("theme","");
+        if (!theme.equals(""))
+            AppCompatDelegate.setDefaultNightMode(Integer.parseInt(theme));
         String isRemember = preferences.getString("remember","");
         if (isRemember.equals("true")) {
             String email = preferences.getString("email","");
