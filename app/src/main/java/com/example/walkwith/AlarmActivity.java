@@ -9,6 +9,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.walkwith.utils.Utilities;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,17 +38,19 @@ public class AlarmActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         final Button alertContactButton = findViewById(R.id.alertContacts);
         alertContactButton.setOnClickListener(view -> {
-            alertPOST(AccountInfo.getEmail());
+            alertPOST(AccountInfo.getEmail(),
+                    AccountInfo.getEmail() + " is in danger!");
         });
     }
 
-    private void alertPOST(String email) {
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+    private void alertPOST(String email, String message) {
+        RequestQueue queue = Volley.newRequestQueue(this);
         String url = getResources().getString(R.string.server_ip) + "alarm";
         try {
             JSONObject jsonBody = new JSONObject();
 
             jsonBody.put("email", email);
+            jsonBody.put("message", message);
 
             JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
                 @Override

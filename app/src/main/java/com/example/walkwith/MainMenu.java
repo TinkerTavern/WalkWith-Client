@@ -370,7 +370,7 @@ public class MainMenu extends FragmentActivity implements View.OnClickListener, 
                 if (!newEmail.equals(""))
                     email = newEmail;
                 else {
-                    Toast.makeText(this, "lost email?", Toast.LENGTH_SHORT).show();
+                    Log.e("weird", "lost email?");
                 }
             }
             jsonBody.put("email", email);

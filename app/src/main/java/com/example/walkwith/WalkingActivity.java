@@ -37,6 +37,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.walkwith.utils.Utilities;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -165,6 +166,8 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
         startWalk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                askToNotify(AccountInfo.getEmail(),
+                        AccountInfo.getEmail() + " has begun walking");
                 active = true;
                 onRoute = true;
                 Log.d("test", "onClick: ");
@@ -583,6 +586,8 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
         sendUpdateWalkPOST(email, Double.toString(currentLocation.latitude),
                 Double.toString(currentLocation.longitude),
                 Boolean.toString(onRoute), "0");
+        askToNotify(AccountInfo.getEmail(),
+                AccountInfo.getEmail() + " has finished walking");
     }
 
     private void askToStop() {
@@ -606,6 +611,67 @@ public class WalkingActivity extends AppCompatActivity implements GoogleMap.OnMy
             }
         });
         builder.show();
+    }
+
+    private void askToNotify(String email, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Notify Trusted Contacts?");
+        builder.setMessage("Do you wish to send notifications to your trusted contacts about your " +
+                "status?");
+        // Set up the buttons
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                alertPOST(email, message);
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                Toast.makeText(getApplicationContext(), "No notifications will be sent",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.show();
+    }
+
+    private void alertPOST(String email, String message) {
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = getResources().getString(R.string.server_ip) + "alarm";
+        try {
+            JSONObject jsonBody = new JSONObject();
+
+            jsonBody.put("email", email);
+            jsonBody.put("message", message);
+
+            JsonObjectRequest jsonObject = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        String result = (String) response.get("result");
+                        if (result.equals("True"))
+                            result = "Successfully alarmed contacts";
+                        else
+                            result = "Error in alerting contacts";
+                        Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+
+                    } catch (JSONException e) {
+                        e.getMessage();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    error.getMessage();
+                }
+            });
+            queue.add(jsonObject);
+
+        } catch (
+                JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void getLastBestLocation() {
